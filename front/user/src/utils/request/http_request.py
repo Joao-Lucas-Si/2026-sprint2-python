@@ -31,7 +31,7 @@ class HttpRequest(ABC):
         self.host = host
 
     def caminhoFinal(self, caminho: str):
-        return os.path.join(self.host, caminho)
+        return f"{self.host}/{caminho}"
 
     def assincrono[J](
         self, func: Callable[[], J], receptor: Callable[[J], None]

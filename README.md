@@ -9,15 +9,18 @@ git clone https://github.com/Joao-Lucas-Si/2026-sprint2-python.git
 depois entre na pasta do projeto e crie um ambiente python
 
 ```
-cd sprint2-python
+cd 2026-sprint2-python
 
 python -m venv venv
 ```
 
-ative o ambiente python e instale as depêndencias
+ative o ambiente python se atentando ao sistema operacioanl usado, e instale as depêndencias
 
 ```
+# para linux
 source venv/bin/activate
+# para wnindows
+./venv/Scripts/Activate.ps1
 
 cd back
 
@@ -41,7 +44,10 @@ flet run main.py
 ## segundo terminal
 
 ```
+# para linux
 source venv/bin/activate
+# para wnindows
+./venv/Scripts/Activate.ps1
 
 cd back
 
