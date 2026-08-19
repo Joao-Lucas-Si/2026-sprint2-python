@@ -1,3 +1,5 @@
 flet
 flet-web
 requests
+websocket-client
+python-socketio[asyncio_client]
