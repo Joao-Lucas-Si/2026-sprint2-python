@@ -11,4 +11,4 @@ def instanciarBanco() -> Engine:
         db = create_engine(caminho)
     if db:
         return db
-    raise Exception("por algum motivo não foi possivel instanciar o banco")
+    raise Exception("por algum motivo não foi possivel instanciar o banco")  # pyright: ignore[reportUnreachable]
