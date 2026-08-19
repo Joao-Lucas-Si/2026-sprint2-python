@@ -1,0 +1,44 @@
+{
+  "version": 1,
+  "author": "Alan",
+  "editor": "wokwi",
+  "parts": [
+    { "type": "board-esp32-devkit-c-v4", "id": "esp", "top": 0, "left": 33.64, "attrs": {} },
+    {
+      "type": "wokwi-lcd2004",
+      "id": "lcd1",
+      "top": -89.6,
+      "left": 216.8,
+      "attrs": { "pins": "i2c" }
+    },
+    {
+      "type": "wokwi-membrane-keypad",
+      "id": "keypad1",
+      "top": -174.8,
+      "left": -320.8,
+      "attrs": {}
+    }
+  ],
+  "connections": [
+    [ "esp:TX", "$serialMonitor:RX", "", [] ],
+    [ "esp:RX", "$serialMonitor:TX", "", [] ],
+    [ "esp:21", "lcd1:SDA", "green", [ "h57.6", "v-115.2" ] ],
+    [ "esp:22", "lcd1:SCL", "green", [ "h57.6", "v-76.8" ] ],
+    [ "esp:3V3", "lcd1:VCC", "red", [ "h-19.05", "v-76.8" ] ],
+    [ "esp:GND.2", "lcd1:GND", "black", [ "v0", "h19.2", "v-86.4" ] ],
+    [ "esp:13", "keypad1:R1", "gold", [ "h-47.85", "v86.4", "h-192" ] ],
+    [ "esp:14", "keypad1:R2", "gold", [ "h-47.85", "v115.2", "h-172.8" ] ],
+    [ "esp:27", "keypad1:R3", "gold", [ "h-47.85", "v124.8", "h-162.9" ] ],
+    [ "esp:26", "keypad1:R4", "gold", [ "h-47.85", "v134.4", "h-153.6" ] ],
+    [ "esp:25", "keypad1:C1", "blue", [ "v0", "h-76.65", "v134.4", "h-115.2" ] ],
+    [ "esp:33", "keypad1:C2", "blue", [ "h-76.65", "v144", "h-134.4" ] ],
+    [ "esp:32", "keypad1:C3", "blue", [ "h-76.65", "v153.6", "h-124.8" ] ],
+    [
+      "esp:23",
+      "keypad1:C4",
+      "blue",
+      [ "h28.8", "v-48", "h-201.6", "v249.6", "h-115.2", "v-76.8" ]
+    ]
+  ],
+  "dependencies": {}
+}

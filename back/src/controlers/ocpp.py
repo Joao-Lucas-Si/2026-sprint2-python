@@ -1,6 +1,5 @@
 from datetime import datetime
 import json
-from os import XATTR_CREATE
 from typing import TypedDict
 
 from flask import jsonify, request
