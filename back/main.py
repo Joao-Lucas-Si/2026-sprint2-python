@@ -8,10 +8,9 @@ import src.controlers.posto
 import src.controlers.ocpp
 
 
-# @app.route("/")
-# def index():
-#     servico = UsuarioQuery()
-#     return f"{servico.tamanho()}"
+@app.route("/")
+def index():
+    return f"connectado"
 
     
     

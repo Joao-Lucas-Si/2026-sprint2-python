@@ -93,7 +93,7 @@ void ValidCode() {
 
     HTTPClient http;
     http.useHTTP10(true);
-    http.begin("http://192.168.15.30:5000/ocpp/verificar-codigo/" + codigo);
+    http.begin("http://host.wokwi.internal:5000/ocpp/verificar-codigo/" + codigo);
     http.GET();
     String result = http.getString();
     Serial.print(result);
@@ -175,9 +175,7 @@ void setup() {
 }
 
 void loop() {
-  int n = WiFi.scanNetworks();
-    Serial.println("Scan done");
-    Serial.println(n)
+ 
   if (!acessoPermitido){
     //Pegando as informação das teclas
     char tecla = teclado.getKey();
