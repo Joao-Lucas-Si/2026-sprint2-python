@@ -10,7 +10,7 @@ from src.components.cabecalho import criarCabecalho
 from src.utils.temporizador import Temporizador
 from src.routes.postos import Posto
 from src.utils.request.instanciar_request import instanciar_request
-
+from random import randint
 
 @ft.component
 def carregar():
@@ -29,7 +29,9 @@ def carregar():
     horas_passadas, set_hora_passada = ft.use_state(0)
     largura = 200
     altura = 200
-    codigo = 2345
+    # codigo = 2345
+    codigo, setCodigo = ft.use_state(randint(1000, 9999))
+    print(codigo)
     porcentagem = ft.use_memo(lambda: atual / energiaInt, [atual])
 
     async def atualizar():
@@ -105,7 +107,7 @@ def carregar():
                 ft.Stack(
                     [
                         ft.Container(
-                            ft.Text(f"{int(porcentagem * 100)}%"),
+                            ft.Text(f"{100 if  porcentagem > 1 else int(porcentagem * 100)}%"),
                             alignment=ft.Alignment.CENTER,
                         ),
                         ft.ProgressRing(porcentagem, width=largura, height=altura),
@@ -115,7 +117,7 @@ def carregar():
                 ),
                 ft.Text(f"energia: {atual}/{energiaInt}"),
                 ft.Text(f"horas restantes: {horas_passadas}/{horas}"),
-                ft.Button("voltar", on_click=lambda : ft.context.page.navigate("/postos")) if atual == energiaInt else ft.Column()
+                ft.Button("voltar", on_click=lambda : ft.context.page.navigate("/postos")) if atual >= energiaInt else ft.Column()
             ] if esta_carregando else [
                 ft.Text(f"codigo: {codigo}")
             ]),
