@@ -16,7 +16,6 @@ class Carregador(BaseModel):
     @staticmethod
     def instanciar(capacidade: int, disponivel: int, ocupado: bool):
         instancia = Carregador()
-        
         instancia.capacidade = capacidade
         instancia.disponivel = disponivel
         instancia.ocupado = ocupado
