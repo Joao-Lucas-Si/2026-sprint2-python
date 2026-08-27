@@ -1,4 +1,3 @@
-from ast import Constant
 from typing import Any
 
 import flet as ft
@@ -7,7 +6,7 @@ from src.components.cabecalho import criarCabecalho
 from src.constants import Constantes, Cores, EstiloConstantes
 from src.utils.request.http_request import CorpoJson
 from src.utils.request.instanciar_request import instanciar_request
-
+from src.utils.use_colors  import usar_cores
 
 class Carregador(CorpoJson):
     capacidade: int
@@ -57,6 +56,7 @@ class Posto(CorpoJson):
 
 @ft.component
 def posto_card(posto: Posto):
+    Cores = usar_cores()
     page = ft.context.page
     async def abrir():
         await page.push_route(f"/postos/{posto.id}")
@@ -87,6 +87,7 @@ def posto_card(posto: Posto):
 
 @ft.component
 def postos():
+    Cores = usar_cores()
     requisicao = instanciar_request(Constantes.HOST.value)
     page = ft.context.page
     async def deslogar():

@@ -6,7 +6,8 @@ from src.components.alerta_erro import alerta_erro
 from src.utils.request.http_request import CorpoJson
 from src.utils.request.instanciar_request import instanciar_request
 from src.components.campo_entrada import campo_entrada
-from src.constants import Assets, Constantes, Cores
+from src.constants import Assets, Constantes
+from src.utils.use_colors import usar_cores
 
 
 class LoginResposta(CorpoJson):
@@ -27,7 +28,7 @@ class LoginResposta(CorpoJson):
 
 @ft.component
 def login():
-    
+    Cores = usar_cores()
     page = ft.context.page
     page.appbar = None
     page.update()

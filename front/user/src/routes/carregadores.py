@@ -2,13 +2,14 @@ import flet as ft
 
 from src.components.alerta_erro import alerta_erro
 from src.components.cabecalho import criarCabecalho
-from src.constants import Constantes, Cores, EstiloConstantes
+from src.constants import Constantes, EstiloConstantes
 from src.routes.postos import Posto, Carregador
 from src.utils.request.instanciar_request import instanciar_request
-
+from src.utils.use_colors import usar_cores
 
 @ft.component
 def carregador_card(carregador: Carregador, i : int):
+    Cores = usar_cores()
     params = ft.use_route_params()
     page = ft.context.page
     async def selecionar():

@@ -1,9 +1,9 @@
 import flet as ft
 
-from src.constants import Cores
-
+from src.utils.use_colors import usar_cores
 
 def aplicar_tema():
+    Cores = usar_cores()
     pagina = ft.context.page
 
     pagina.theme = ft.Theme(
