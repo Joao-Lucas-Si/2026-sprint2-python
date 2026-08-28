@@ -88,7 +88,7 @@ void carregador()
 
     requisitar("/ocpp/MeterValue/" + codigo + "/" + poder);
     bateria += poder;
-    delay(1000);
+    delay(500);
     LCD.clear();
   }
   LCD.setCursor(6, 3);
@@ -96,7 +96,7 @@ void carregador()
   LCD.setCursor(5, 2);
   LCD.print("Terminada");
 
-  delay(2000);
+  // delay(200);
   LCD.clear();
   acessoPermitido = false;
   return;

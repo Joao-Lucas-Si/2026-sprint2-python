@@ -6,6 +6,7 @@ from typing import Any
 import websocket
 import flet as ft
 import socketio
+from src.utils.use_colors import usar_cores
 from src.components.cabecalho import criarCabecalho
 from src.utils.temporizador import Temporizador
 from src.routes.postos import Posto
@@ -14,7 +15,8 @@ from random import randint
 
 @ft.component
 def carregar():
-    criarCabecalho()
+    # criarCabecalho()
+    Cores = usar_cores()
     params = ft.use_route_params()
     energia = params["energia"]
     postoId = params["postoId"]
@@ -98,16 +100,18 @@ def carregar():
         # porcentagem_texto.value = f"{int(porcentagem * 100)}%"
 
     # temporizador = Temporizador(1, atualizar)
-    
+    ft.context.page.appbar = None
     ft.use_effect(atualizar, [])
     horas = math.ceil(energiaInt / carregador.capacidade)
     return ft.SafeArea(
+        
+        
         ft.Column(
              ([
                 ft.Stack(
                     [
                         ft.Container(
-                            ft.Text(f"{100 if  porcentagem > 1 else int(porcentagem * 100)}%"),
+                            ft.Text(f"{100 if  porcentagem > 1 else int(porcentagem * 100)}%", size=35, color=Cores.PRIMARIO_CLARO, weight=ft.FontWeight.BOLD),
                             alignment=ft.Alignment.CENTER,
                         ),
                         ft.ProgressRing(porcentagem, width=largura, height=altura),
@@ -115,16 +119,30 @@ def carregar():
                     width=largura,
                     height=altura,
                 ),
-                ft.Text(f"energia: {atual}/{energiaInt}"),
-                ft.Text(f"horas restantes: {horas_passadas}/{horas}"),
+                ft.Text(f"energia: {atual}/{energiaInt}", size=20),
+                # ft.Text(f"horas restantes: {horas_passadas}/{horas}"),
                 ft.Button("voltar", on_click=lambda : ft.context.page.navigate("/postos")) if atual >= energiaInt else ft.Column()
             ] if esta_carregando else [
-                ft.Text(f"codigo: {codigo}")
+                ft.Text("Codigo:", size=30),
+                ft.Text(f"{codigo}", 
+                color=Cores.PRIMARIO_CLARO,
+                # style=ft.TextStyle(foreground=ft.Paint(
+                #                 gradient=ft.LinearGradient(
+                #                     begin=ft.Alignment.TOP_LEFT,
+                #                     end=ft.Alignment.BOTTOM_RIGHT,
+                #                     colors=[ft.Colors.RED, ft.Colors.YELLOW],
+                #                 )
+                #                 # gradient=Cores.gradiente()
+                #             ),), 
+                            size=60, weight=ft.FontWeight.BOLD, ),
+                ft.Container(padding=10,content=ft.Text("digite este numero no carregador que você escolheu para começar a recarga", size=15,  color=Cores.TEXTO_SECUNDARIO, text_align=ft.TextAlign.CENTER))
+                
             ]),
             align=ft.Alignment.CENTER,
             alignment=ft.MainAxisAlignment.CENTER,
             horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-            expand=True
+            expand=True,
+            height=ft.context.page.height
         ),
         # alignment=ft.Alignment.CENTER,
         

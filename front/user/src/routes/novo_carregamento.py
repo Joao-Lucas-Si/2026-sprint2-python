@@ -1,56 +1,92 @@
 import flet as ft
+from src.constants import Constantes
+from src.routes.postos import Carregador, Posto
+from src.utils.request.instanciar_request import instanciar_request
 from src.utils.use_colors import usar_cores
+
+def converter_energia_para_preco(valor: float, carregador: Carregador):
+    return carregador.preco * valor
+
+
+def converter_preco_para_energia(valor: float, carregador: Carregador):
+    if valor == 0:
+        return 0
+    return valor / carregador.preco  
 
 @ft.component
 def carregamento():
     Cores = usar_cores()
     page = ft.context.page
     page.title = "Elevo"
-    page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
-    page.vertical_alignment = ft.MainAxisAlignment.CENTER
-    page.padding = 0
-    page.bgcolor = Cores.FUNDO
+    # page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
+    # page.vertical_alignment = ft.MainAxisAlignment.CENTER
+    # page.padding = 0
+    # page.bgcolor = Cores.FUNDO
 
-    DADOS_PORCENTAGEM = {
+    params = ft.use_route_params()
+    postoId = params["postoId"]
+    carregadorId = params["carregadorId"]
+    requisicao = instanciar_request(Constantes.HOST.value)
+    posto = requisicao.get_entidade(Constantes.OBTER_POSTO(postoId), Posto)
+    modo, setModo = ft.use_state(True)
+    carregador = posto.carregadores[int(carregadorId)]
+    valor,setValor = ft.use_state(20.0)
+
+    energia_max = 200
+
+    max = energia_max * carregador.preco if modo else energia_max
+
+    medio = max / 2
+
+    inicial =1 / 4 *  max 
+
+    DADOS_ENERGIA = {
         "rotulo": "Carregar até",
-        "valor_principal": "50%",
-        "chips": ["50%", "80%", "100%"],
+        "valor_principal": lambda x: f"{x:.2f}kW",
+        "chips":  lambda x: f"{x:.2f}kW",
+        "valores": [inicial, medio, max],
         "rotulo_info_1": "Tempo estimado",
         "valor_info_1": "50 min",
         "rotulo_info_2": "Custo estimado",
-        "valor_info_2": "R$ 30,00",
+        "valor_info_2": f"R$ {converter_energia_para_preco(valor, carregador):.2f}",
         "texto_link": "Prefiro definir por valor em R$  \u2197",
     }
 
     DADOS_VALOR = {
         "rotulo": "Valor a carregar",
-        "valor_principal": "R$ 60",
-        "chips": ["R$ 20", "R$ 50", "R$ 100"],
-        "rotulo_info_1": "Energia estimada",
-        "valor_info_1": "50 kWh",
-        "rotulo_info_2": "Bateria estimada",
-        "valor_info_2": "~100%",
-        "texto_link": "Prefiro definir por porcentagem  \u2197",
+        "valor_principal": lambda x: f"R$ {x:.2f}",
+        "chips": lambda x: f"R$ {x:.2f}",
+        "valores": [inicial, medio,max],
+        "rotulo_info_1": "Tempo estimado",
+        "valor_info_1": "50 min",
+        "rotulo_info_2": "Energia estimada",
+        "valor_info_2": f"{converter_preco_para_energia(valor, carregador):.2f} kW",
+       
+        "texto_link": "Prefiro definir por energia  \u2197",
     }
+
+
+    escolhido =DADOS_VALOR if modo else DADOS_ENERGIA
 
     estado = {"modo_valor": False, "largura_conteudo": 340}
 
+
     titulo = ft.Text(
-        "Posto Av. Paulista",
+        posto.nome,
         size=20,
         weight=ft.FontWeight.W_600,
         color=Cores.TEXTO,
     )
 
     rotulo_meta = ft.Text(
-        DADOS_PORCENTAGEM["rotulo"],
+        escolhido["rotulo"],
         size=15,
         color=Cores.TEXTO_SECUNDARIO,
         text_align=ft.TextAlign.CENTER,
     )
 
     valor_principal = ft.Text(
-        DADOS_PORCENTAGEM["valor_principal"],
+        escolhido["valor_principal"](valor),
         size=60,
         weight=ft.FontWeight.BOLD,
         color=Cores.PRIMARIO,
@@ -76,22 +112,24 @@ def carregamento():
 
     slider_carga = ft.Slider(
         min=0,
-        max=100,
-        value=50,
+        max=max,
+        value=valor,
         width=estado["largura_conteudo"],
         active_color=Cores.PRIMARIO,
         inactive_color=Cores.ICONE_INATIVO,
         thumb_color=Cores.PRIMARIO_CLARO,
+        on_change=lambda x: setValor(x.control.value or 0)
     )
 
-    def criar_chip(texto: str, selecionado: bool = False):
+    def criar_chip(texto: str, i: int):
+        selecionado = valor == escolhido["valores"][i]
         texto_chip = ft.Text(
             texto,
             size=15,
             color=Cores.TEXTO,
             weight=ft.FontWeight.W_500,
         )
-        container_chip = ft.Container(
+        container_chip = ft.GestureDetector(on_tap=lambda : setValor(escolhido["valores"][i]), content=ft.Container(
             content=texto_chip,
             width=104,
             height=54,
@@ -102,15 +140,21 @@ def carregamento():
                 2 if selecionado else 1,
                 Cores.PRIMARIO if selecionado else Cores.DIVISOR,
             ),
-        )
+        ))
         return container_chip, texto_chip
 
-    chip1_container, chip1_texto = criar_chip(DADOS_PORCENTAGEM["chips"][0], selecionado=True)
-    chip2_container, chip2_texto = criar_chip(DADOS_PORCENTAGEM["chips"][1])
-    chip3_container, chip3_texto = criar_chip(DADOS_PORCENTAGEM["chips"][2])
+
+
+    chips: list[ft.Control] = []
+
+    for i, val in enumerate(escolhido["valores"]):
+        chip1_container, chip1_texto = criar_chip(escolhido["chips"](val), i)
+        chips.append(chip1_container)
+    # chip2_container, chip2_texto = criar_chip(escolhido["chips"][1], 1)
+    # chip3_container, chip3_texto = criar_chip(escolhido["chips"][2], 2)
 
     chips_rapidos = ft.Row(
-        controls=[chip1_container, chip2_container, chip3_container],
+        controls=chips,
         alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
     )
 
@@ -125,10 +169,10 @@ def carregamento():
         return coluna, texto_rotulo, texto_valor
 
     coluna_info_1, rotulo_info_1, valor_info_1 = criar_coluna_info(
-        DADOS_PORCENTAGEM["rotulo_info_1"], DADOS_PORCENTAGEM["valor_info_1"], ft.CrossAxisAlignment.START
+        escolhido["rotulo_info_1"], escolhido["valor_info_1"], ft.CrossAxisAlignment.START
     )
     coluna_info_2, rotulo_info_2, valor_info_2 = criar_coluna_info(
-        DADOS_PORCENTAGEM["rotulo_info_2"], DADOS_PORCENTAGEM["valor_info_2"], ft.CrossAxisAlignment.END
+        escolhido["rotulo_info_2"], escolhido["valor_info_2"], ft.CrossAxisAlignment.END
     )
 
     caixa_estimativas = ft.Container(
@@ -143,7 +187,7 @@ def carregamento():
     )
 
     texto_link = ft.Text(
-        DADOS_PORCENTAGEM["texto_link"],
+        escolhido["texto_link"],
         size=14,
         weight=ft.FontWeight.W_500,
         color=Cores.PRIMARIO_CLARO,
@@ -152,23 +196,29 @@ def carregamento():
 
     def alternar_modo(e):
         estado["modo_valor"] = not estado["modo_valor"]
-        dados = DADOS_VALOR if estado["modo_valor"] else DADOS_PORCENTAGEM
+        if modo:
+            setValor(converter_preco_para_energia(valor, carregador))
+        else:
+            setValor(converter_energia_para_preco(valor, carregador))
+        setModo(not modo)
+        
+        # dados = DADOS_VALOR if estado["modo_valor"] else DADOS_PORCENTAGEM
 
-        rotulo_meta.value = dados["rotulo"]
-        valor_principal.value = dados["valor_principal"]
+        # rotulo_meta.value = dados["rotulo"]
+        # valor_principal.value = dados["valor_principal"]
 
-        chip1_texto.value = dados["chips"][0]
-        chip2_texto.value = dados["chips"][1]
-        chip3_texto.value = dados["chips"][2]
+        # chip1_texto.value = dados["chips"][0]
+        # chip2_texto.value = dados["chips"][1]
+        # chip3_texto.value = dados["chips"][2]
 
-        rotulo_info_1.value = dados["rotulo_info_1"]
-        valor_info_1.value = dados["valor_info_1"]
-        rotulo_info_2.value = dados["rotulo_info_2"]
-        valor_info_2.value = dados["valor_info_2"]
+        # rotulo_info_1.value = dados["rotulo_info_1"]
+        # valor_info_1.value = dados["valor_info_1"]
+        # rotulo_info_2.value = dados["rotulo_info_2"]
+        # valor_info_2.value = dados["valor_info_2"]
 
-        texto_link.value = dados["texto_link"]
+        # texto_link.value = dados["texto_link"]
 
-        page.update()
+        # page.update()
 
     link_definir_valor = ft.Container(
         content=texto_link,
@@ -176,7 +226,20 @@ def carregamento():
         on_click=alternar_modo,
     )
 
-    botao_confirmar = ft.Container(
+    async def carregar():
+        energia = converter_preco_para_energia(valor, carregador) if modo else valor
+        preco = converter_energia_para_preco(valor, carregador) if not modo else valor
+        id = await ft.SharedPreferences().get("id")
+        requisicao.post_map_sem("/recargas/add", {
+            "usuario": id,
+            "preco": preco,
+            "quantidade": energia,
+            "preco_kwh": carregador.capacidade,
+            "carregador": carregador.id
+        })
+        page.navigate(f"/postos/{postoId}/{carregadorId}/{int(energia)}")
+
+    botao_confirmar = ft.GestureDetector(on_tap=carregar, content=ft.Container(
         width=estado["largura_conteudo"],
         height=58,
         border_radius=14,
@@ -188,7 +251,21 @@ def carregamento():
             weight=ft.FontWeight.W_600,
             color=Cores.TEXTO_PRIMARIO,
         ),
-    )
+    ))
+
+    botao_voltar = ft.GestureDetector(on_tap=lambda : page.navigate(f"/postos/{postoId}/"), content=ft.Container(
+        width=estado["largura_conteudo"],
+        height=58,
+        border_radius=14,
+        gradient=Cores.gradiente(),
+        alignment=ft.Alignment.CENTER,
+        content=ft.Text(
+            "Cancelar",
+            size=16,
+            weight=ft.FontWeight.W_600,
+            color=Cores.TEXTO_PRIMARIO,
+        ),
+    ))
 
     cartao = ft.Container(
         width=420,
@@ -219,35 +296,14 @@ def carregamento():
                 link_definir_valor,
                 ft.Container(height=20),
                 botao_confirmar,
+                botao_voltar
+                
             ],
             horizontal_alignment=ft.CrossAxisAlignment.CENTER,
             spacing=6,
         ),
     )
 
-    nav_inferior = ft.Container(
-        padding=ft.Padding.symmetric(horizontal=30, vertical=16),
-        gradient=ft.LinearGradient(
-            begin=ft.Alignment.TOP_LEFT,
-            end=ft.Alignment.BOTTOM_RIGHT,
-            colors=[
-                "#FF6B4A",
-                "#E8351C",
-                "#C41E12",
-            ],
-            stops=[0.0, 0.5, 1.0],
-        ),
-        content=ft.Row(
-            alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
-            controls=[
-                ft.Icon(ft.Icons.HOME_FILLED, color=Cores.TEXTO_PRIMARIO),
-                ft.Icon(ft.Icons.MAP_OUTLINED, color=Cores.TEXTO_PRIMARIO),
-                ft.Icon(ft.Icons.EV_STATION, color=Cores.TEXTO_PRIMARIO),
-                ft.Icon(ft.Icons.HISTORY, color=Cores.TEXTO_PRIMARIO),
-                ft.Icon(ft.Icons.PERSON_OUTLINE, color=Cores.TEXTO_PRIMARIO),
-            ],
-        ),
-    )
 
     # área central: expande junto com a janela (expand=True), mas o padding
     # abaixo é o que GARANTE que sempre sobra fundo preto visível nas bordas
@@ -264,7 +320,7 @@ def carregamento():
     MARGEM = 20                    # PRECISA ser igual ao padding do area_central acima
     LARGURA_MAXIMA_CARTAO = 420    # trava o cartão em telas grandes (senão ele "esparrama")
 
-    def ajustar_layout(e=None):
+    def ajustar_layout():
         largura_janela = page.width or 480
 
         # espaço realmente livre dentro do container, descontando os 2 lados da margem
@@ -278,7 +334,7 @@ def carregamento():
         cartao.width = largura_cartao
         barra_fundo.width = largura_conteudo
         barra_progresso.width = largura_conteudo
-        barra_preenchida.width = largura_conteudo * (slider_carga.value / 100)
+        barra_preenchida.width = largura_conteudo * ( (slider_carga.value or 1) / max)
         slider_carga.width = largura_conteudo
         caixa_estimativas.width = largura_conteudo
         botao_confirmar.width = largura_conteudo
@@ -287,11 +343,16 @@ def carregamento():
 
     page.on_resized = ajustar_layout
     ajustar_layout()
-
-    return ft.Column(
+    page.bottom_appbar = None
+    page.appbar = None
+    # page.overlay.append()
+    # ft.CupertinoNavigationBar()
+ 
+    return ft.SafeArea(ft.Column(
             expand=True,
             spacing=0,
-            horizontal_alignment=ft.CrossAxisAlignment.STRETCH,
-            controls=[area_central, nav_inferior],
-        )
+            horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+            alignment=ft.MainAxisAlignment.CENTER,
+            controls=[area_central],
+        ))
     

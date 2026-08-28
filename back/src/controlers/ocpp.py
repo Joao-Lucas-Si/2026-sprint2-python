@@ -52,6 +52,8 @@ def heart_beat():
 def meterValue(codigo: int, valor: int):
     carregamento = next(obter_carregamento(codigo))
     carregamento["energia"] += valor 
+    if carregamento["energia"] > carregamento["quantidade"]:
+        carregamento["energia"] = carregamento["quantidade"]
     socketio.emit("MeterValue", {
         "valor": carregamento["energia"]
     })

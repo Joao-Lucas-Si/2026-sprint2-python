@@ -1,15 +1,16 @@
 from sqlalchemy import ForeignKey
 
+from src.database.models.recarga import Recarga
 from src.database.models.base import BaseModel
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 # from back.src.database.models.posto import Posto
 
 class Pagamento(BaseModel):
-    __tablename__="pagamento"
-    usuario_id: Mapped[int] = mapped_column(ForeignKey("usuario.id"))
+    __tablename__="pagamentos"
+    usuario_id: Mapped[int] = mapped_column(ForeignKey("usuarios.id"))
+    recargas: Mapped[list[Recarga]] = relationship(lazy="subquery")
     # veiculo_id: Mapped[int] = mapped_column(ForeignKey("veiculo.id"))
-    # recarga_id: Mapped[int] = mapped_column(ForeignKey("recarga.id"))
     # data_hora: Mapped[int] = mapped_column()
     # local_eletroposto: Mapped[int] = mapped_column()
     # energia_consumida_kwh: Mapped[int] = mapped_column()
@@ -20,7 +21,8 @@ class Pagamento(BaseModel):
     # seguranca: Mapped[int] = mapped_column()
     # comprovante: Mapped[int] = mapped_column()
     # custo_economizado_combustivel: Mapped[int] = mapped_column()
-    quantidade: Mapped[int] = mapped_column()
+    # quantidade: Mapped[int] = mapped_column()
+    # preco: Mapped[float] = mapped_column()
     forma_pagamento: Mapped[str] = mapped_column()
         # Cartao de credito
         # Cartao de debito

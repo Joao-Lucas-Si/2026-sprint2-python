@@ -1,5 +1,6 @@
 import flet as ft
 
+from src.routes.tela_pagamento import tela_pagamento
 from src.routes.cadastro import cadastro
 from src.routes.login import login
 from src.routes.abastecer import abastecer
@@ -15,6 +16,7 @@ def main_router():
         [
             ft.Route(index=True, component=login),
             ft.Route("cadastro", component=cadastro),
+            ft.Route("pagamento", component=tela_pagamento),
             ft.Route(
                 "postos",
                 children=[

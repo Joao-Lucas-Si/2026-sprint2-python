@@ -12,7 +12,7 @@ def abastecer():
     postoId = params["postoId"]
     carregadorId = params["carregadorId"]
 
-    criarCabecalho(lambda: page.navigate(f"/postos/{postoId}"))
+    # criarCabecalho(lambda: page.navigate(f"/postos/{postoId}"))
     valor: str = ""
     campo = campo_entrada("quantidade", ft.Icons.STORAGE)
 

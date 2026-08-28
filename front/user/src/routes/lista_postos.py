@@ -1,55 +1,52 @@
 import flet as ft
+from src.utils.status_config import status_config
+from src.components.navbar import navbar
+from src.constants import Constantes
+from src.routes.postos import Carregador, Posto
+from src.utils.request.instanciar_request import instanciar_request
 from src.utils.use_colors import usar_cores
  
  
 # Dados de exemplo dos postos de recarga
 # status pode ser: "disponivel", "ocupado" ou "manutencao"
-postos = [
-    {
-        "nome": "EletroPosto Central",
-        "local": "Av. Paulista, São Paulo",
-        "imagem": "https://picsum.photos/seed/posto1/200/200",
-        "preco": "R$ 1,20/kWh",
-        "tipo": "RÁPIDO",
-        "status": "disponivel",
-    },
-    {
-        "nome": "Shopping Recarga Sul",
-        "local": "Zona Sul, São Paulo",
-        "imagem": "https://picsum.photos/seed/posto2/200/200",
-        "preco": "R$ 0,95/kWh",
-        "tipo": "PADRÃO",
-        "status": "ocupado",
-    },
-    {
-        "nome": "VoltPark Norte",
-        "local": "Zona Norte, São Paulo",
-        "imagem": "https://picsum.photos/seed/posto3/200/200",
-        "preco": "R$ 1,35/kWh",
-        "tipo": "RÁPIDO",
-        "status": "disponivel",
-    },
-    {
-        "nome": "Posto Verde Energia",
-        "local": "Alphaville, Barueri",
-        "imagem": "https://picsum.photos/seed/posto4/200/200",
-        "preco": "R$ 1,10/kWh",
-        "tipo": "PADRÃO",
-        "status": "manutencao",
-    },
-]
+# postos = [
+#     {
+#         "nome": "EletroPosto Central",
+#         "local": "Av. Paulista, São Paulo",
+#         "imagem": "https://picsum.photos/seed/posto1/200/200",
+#         "preco": "R$ 1,20/kWh",
+#         "tipo": "RÁPIDO",
+#         "status": "disponivel",
+#     },
+#     {
+#         "nome": "Shopping Recarga Sul",
+#         "local": "Zona Sul, São Paulo",
+#         "imagem": "https://picsum.photos/seed/posto2/200/200",
+#         "preco": "R$ 0,95/kWh",
+#         "tipo": "PADRÃO",
+#         "status": "ocupado",
+#     },
+#     {
+#         "nome": "VoltPark Norte",
+#         "local": "Zona Norte, São Paulo",
+#         "imagem": "https://picsum.photos/seed/posto3/200/200",
+#         "preco": "R$ 1,35/kWh",
+#         "tipo": "RÁPIDO",
+#         "status": "disponivel",
+#     },
+#     {
+#         "nome": "Posto Verde Energia",
+#         "local": "Alphaville, Barueri",
+#         "imagem": "https://picsum.photos/seed/posto4/200/200",
+#         "preco": "R$ 1,10/kWh",
+#         "tipo": "PADRÃO",
+#         "status": "manutencao",
+#     },
+# ]
  
  
-def status_config(status: str):
-    Cores = usar_cores()
 
-    """Retorna (texto, cor) de acordo com o status do posto."""
-    if status == "disponivel":
-        return "Disponível", Cores.DISPONIVEL
-    elif status == "ocupado":
-        return "Ocupado", Cores.OCUPADO
-    else:
-        return "Manutenção", Cores.MANUTENCAO
+
  
 @ft.component
 def lista_postos():
@@ -59,23 +56,25 @@ def lista_postos():
     page.bgcolor = Cores.FUNDO # fundo da pagina 
     page.padding = 0
     page.scroll = ft.ScrollMode.HIDDEN
-    page.window.width = 400
-    page.window.height = 800
+
  
-    def selecionar_posto(nome):
+    def selecionar_posto(posto: Posto):
         def handler(e):
-            page.open(
-                ft.SnackBar(
-                    ft.Text(f"Navegando até {nome}..."),
-                    bgcolor=Cores.PRIMARIO,
-                )
-            )
+            page.navigate(f"/postos/{posto.id}")
+            #     ft.SnackBar(
+            #         ft.Text(f"Navegando até {nome}..."),
+            #         bgcolor=Cores.PRIMARIO,
+            #     )
+            # )
         return handler
 
     @ft.component
-    def criar_card_posto(posto: dict) -> ft.Container:
-        texto_status, cor_status = status_config(posto["status"])
-        pode_reservar = posto["status"] == "disponivel"
+    def criar_card_posto(posto: Posto) -> ft.Container:
+        disponivel = any([not carregador.ocupado for carregador in posto.carregadores])
+        status = "disponivel" if disponivel else "ocupado"
+        texto_status, cor_status = status_config(status)
+        pode_reservar = status == "disponivel"
+        # pode_reservar = True
  
         return ft.Container(
             bgcolor=Cores.CARD,
@@ -87,7 +86,7 @@ def lista_postos():
                     # Imagem do posto
                     ft.Container(
                         content=ft.Image(
-                            src=posto["imagem"],
+                            src=posto.imagem,
                             width=70,
                             height=70,
                             fit=ft.BoxFit.COVER,
@@ -101,15 +100,15 @@ def lista_postos():
                         expand=True,
                         spacing=2,
                         controls=[
+                            # ft.Text(
+                            #     posto.tipo,
+                            #     size=10,
+                            #     weight=ft.FontWeight.BOLD,
+                            #     color=Cores.TEXTO_SECUNDARIO,
+                            #     style=ft.TextStyle(letter_spacing=1),
+                            # ),
                             ft.Text(
-                                posto["tipo"],
-                                size=10,
-                                weight=ft.FontWeight.BOLD,
-                                color=Cores.TEXTO_SECUNDARIO,
-                                style=ft.TextStyle(letter_spacing=1),
-                            ),
-                            ft.Text(
-                                posto["nome"],
+                                posto.nome,
                                 size=15,
                                 weight=ft.FontWeight.W_600,
                                 color=Cores.TEXTO,
@@ -123,7 +122,7 @@ def lista_postos():
                                         color=Cores.TEXTO_SECUNDARIO,
                                     ),
                                     ft.Text(
-                                        posto["local"],
+                                        posto.local,
                                         size=12,
                                         color=Cores.TEXTO_SECUNDARIO,
                                     ),
@@ -160,7 +159,7 @@ def lista_postos():
                         spacing=8,
                         controls=[
                             ft.Text(
-                                posto["preco"],
+                                f"R$ {posto.preco_medio:0.2f}/kWh",
                                 size=13,
                                 weight=ft.FontWeight.BOLD,
                                 color=Cores.TEXTO,
@@ -176,8 +175,8 @@ def lista_postos():
                                 color=Cores.TEXTO
                                 if pode_reservar
                                 else Cores.TEXTO_SECUNDARIO,
-                                disabled=not pode_reservar,
-                                on_click=selecionar_posto(posto["nome"]),
+                                # disabled=not pode_reservar,
+                                on_click=selecionar_posto(posto),
                                 style=ft.ButtonStyle(
                                     shape=ft.RoundedRectangleBorder(radius=10)
                                 ),
@@ -192,65 +191,59 @@ def lista_postos():
     
     
     cabecalho = ft.Container(
+        expand=1,
         padding=ft.Padding(left=20, right=20, top=20, bottom=10),
         content=ft.Row(
             alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
             controls=[
-                ft.Row(
-                    spacing=10,
-                    controls=[
-                        ft.Icon(ft.Icons.ARROW_BACK, color=Cores.TEXTO),
-                        ft.Text(
-                            "Postos de Recarga",
-                            size=18,
-                            weight=ft.FontWeight.BOLD,
-                            color=Cores.TEXTO,
-                        ),
-                    ],
-                ),
+               
                 ft.Icon(ft.Icons.SEARCH, color=Cores.TEXTO),
             ],
         ),
     )
  
+
+    page.appbar = ft.CupertinoAppBar( bgcolor=Cores.FUNDO, padding=ft.Padding.symmetric(horizontal=20), leading=ft.Text(
+                            "Postos de Recarga",
+                            size=18,
+                            weight=ft.FontWeight.BOLD,
+                            color=Cores.TEXTO,
+                        ),trailing=ft.Icon(ft.Icons.SEARCH, color=Cores.TEXTO))
+
     # Lista de cards
+    navbar()
+    requisicao = instanciar_request(Constantes.HOST.value)
     
-    
-    
-    
+    postos = requisicao.get_lista("postos", Posto)
+
+    # postos.extend(postos)
     lista_postos = ft.ListView(
-        expand=True,
+        expand=1,
+        # height=page.window.height * 0.8,
+        # height=float("inf") * 0.8,
         spacing=14,
+        scroll=ft.ScrollMode.ALWAYS,
         padding=ft.Padding.symmetric(horizontal=20),
         controls=[criar_card_posto(p) for p in postos],
     )
  
-    # Barra de navegação inferior
-    nav_inferior = ft.Container(
-        padding=ft.Padding.symmetric(horizontal=30, vertical=16),
-        bgcolor=Cores.PRIMARIO,
-        content=ft.Row(
-            alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
-            controls=[
-                #CORES CABEÇALHO
-                ft.Icon(ft.Icons.HOME_FILLED, color=Cores.TEXTO, ),
-                ft.Icon(ft.Icons.MAP_OUTLINED, color=Cores.TEXTO),
-                ft.Icon(ft.Icons.EV_STATION, color=Cores.TEXTO),
-                ft.Icon(ft.Icons.HISTORY, color=Cores.TEXTO),
-                ft.Icon(ft.Icons.PERSON_OUTLINE, color=Cores.TEXTO),
-            ],
-        ),
+
+   
+    return ft.SafeArea(
+        lista_postos
+        # ft.Column(
+        #     expand=True,
+        #     # height=float("inf"),
+        #     # height=page.window.height,
+        #     spacing=0,
+        #     # alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
+        #     controls=[
+        #         cabecalho,
+        #         lista_postos,
+        #         # nav_inferior,
+        #     ],
+        # )
     )
- 
-    return ft.Column(
-            expand=True,
-            spacing=0,
-            controls=[
-                cabecalho,
-                lista_postos,
-                nav_inferior,
-            ],
-        )
     
  
  

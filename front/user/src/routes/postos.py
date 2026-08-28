@@ -12,16 +12,21 @@ class Carregador(CorpoJson):
     capacidade: int
     disponivel: int
     ocupado: bool
+    id: int
+    preco: float = 1.4
+    # posto: "Posto"
 
-    def __init__(self, capacidade: int, disponivel: int, ocupado: bool) -> None:
+    def __init__(self,id: int,  capacidade: int, preco: int, disponivel: int, ocupado: bool) -> None:
         super().__init__()
+        self.id = id
         self.capacidade = capacidade
         self.disponivel = disponivel
         self.ocupado = ocupado
+        self.preco = preco
 
     @staticmethod
     def instanciar(json: dict) -> Any:
-        instancia = Carregador(json["capacidade"], json["disponivel"], json["ocupado"])
+        instancia = Carregador(json["id"], json["capacidade"], json["preco"], json["disponivel"], json["ocupado"])
 
         return instancia
 
@@ -29,7 +34,11 @@ class Carregador(CorpoJson):
 class Posto(CorpoJson):
     id: int
     carregadores: list[Carregador]
+    imagem: str
+    descricao: str = ""
     nome: str
+    local: str = ""
+    preco_medio: float = 0
 
     @property
     def capacidade_media(self):
@@ -43,15 +52,17 @@ class Posto(CorpoJson):
             carregador for carregador in self.carregadores if not carregador.ocupado
         ]
 
-    def __init__(self, id: int, nome: str, carregadores: list[Carregador]) -> None:
+    def __init__(self, id: int, nome: str, carregadores: list[Carregador], imagem: str, preco_medio: float) -> None:
         super().__init__()
         self.id = id
         self.nome = nome
         self.carregadores = carregadores
+        self.imagem = imagem
+        self.preco_medio = preco_medio
 
     @staticmethod
     def instanciar(json: dict) -> Any:
-        return Posto(json["id"], json["nome"], list(map(lambda x: Carregador.instanciar(x), json["carregadores"])))
+        return Posto(json["id"], json["nome"], list(map(lambda x: Carregador.instanciar(x), json["carregadores"])),  json["imagem"], json["preco_medio"])
 
 
 @ft.component

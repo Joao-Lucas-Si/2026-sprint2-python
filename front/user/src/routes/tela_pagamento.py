@@ -1,4 +1,11 @@
+from typing import Any
+
 import flet as ft
+from src.components.alerta_erro import alerta_sucesso
+from src.routes.postos import Carregador, Posto
+from src.constants import Constantes
+from src.utils.request.http_request import CorpoJson
+from src.utils.request.instanciar_request import instanciar_request
 from src.utils.use_colors import usar_cores
 
 
@@ -6,6 +13,23 @@ def borda_all(width, color):
     return ft.Border.all(width=width, color=color)
 
 # APLICAÇÃO
+
+class Recarga(CorpoJson):
+    preco_kwh: float
+    preco: float
+    quantidade: float
+    carregador: Carregador
+    posto: Posto
+
+    @staticmethod
+    def instanciar(json: dict) -> Any:
+        recarga = Recarga()
+
+        recarga.preco = json["preco"]
+        recarga.quantidade = json["quantidade"]
+        recarga.preco_kwh = json["preco_kwh"]
+        recarga.posto = Posto.instanciar(json["posto"])
+        return recarga
 
 @ft.component
 def tela_pagamento():
@@ -21,8 +45,6 @@ def tela_pagamento():
 
     page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
     page.scroll = ft.ScrollMode.AUTO
-
-    valor = "0,00"
 
    
     # TEMA ATUAL (Fixo no Escuro)
@@ -56,7 +78,7 @@ def tela_pagamento():
     # ÍCONE SIMPLES
     
 
-    def icone(simbolo, tamanho=44):
+    def icone(simbolo, tamanho=44) -> ft.Control:
         t = tema()
 
         return ft.Container(
@@ -85,7 +107,7 @@ def tela_pagamento():
         t = tema()
 
         return ft.Container(
-            width=largura_conteudo(),
+            # width=largura_conteudo(),
             padding=16,
             content=ft.Row(
                 vertical_alignment=ft.CrossAxisAlignment.CENTER,
@@ -113,7 +135,43 @@ def tela_pagamento():
 
     
     # BARRA SUPERIOR
-    
+
+    page.appbar = ft.CupertinoAppBar(bgcolor=Cores.CARD, trailing= ft.Container(
+                        padding=8,
+                        border_radius=20,
+                        width=25,
+                        bgcolor="#2ECC7118",
+                        content=ft.Row(
+                            spacing=6,
+                            controls=[
+                                ft.Container(
+                                    width=7,
+                                    height=7,
+                                    bgcolor=Cores.DISPONIVEL,
+                                    border_radius=4,
+                                ),
+                                
+                                
+                            ],
+                        ),
+                    ), leading= ft.Container(
+                        width=42,
+                        height=42,
+                        border_radius=21,
+                        gradient=Cores.gradiente(),
+                        content=ft.Row(
+                            alignment=ft.MainAxisAlignment.CENTER,
+                            vertical_alignment=ft.CrossAxisAlignment.CENTER,
+                            controls=[
+                                ft.Text(
+                                    "G",
+                                    size=20,
+                                    color="#FFFFFF",
+                                    weight=ft.FontWeight.BOLD,
+                                )
+                            ],
+                        ),
+                    ),)
 
     def top_bar():
         t = tema()
@@ -201,7 +259,7 @@ def tela_pagamento():
                         "Continuar Pagamento",
                         size=15,
                         weight=ft.FontWeight.W_600,
-                        color=t.TEXTO_SOBRE_PRIMARIO,
+                        color=Cores.TEXTO_PRIMARIO,
                     )
                 ],
             ),
@@ -212,6 +270,7 @@ def tela_pagamento():
     
 
     def card_pagamento():
+        valor = sum([recarga.preco for recarga in recargas])
         t = tema()
 
         return ft.Container(
@@ -249,7 +308,7 @@ def tela_pagamento():
                             ),
                             ft.Container(width=8),
                             ft.Text(
-                                valor,
+                                f"{valor:.2f}",
                                 size=48,
                                 weight=ft.FontWeight.W_300,
                                 color=t.TEXTO,
@@ -262,8 +321,8 @@ def tela_pagamento():
                         size=11,
                         color=t.TEXTO_SECUNDARIO,
                     ),
-                    ft.Container(height=22),
-                    botao_principal(),
+                    # ft.Container(height=22),
+                    # botao_principal(),
                 ],
             ),
         )
@@ -271,6 +330,95 @@ def tela_pagamento():
     
     # CARD DE OPÇÃO (MÉTODO DE PAGAMENTO)
     
+    def card_recarga(recarga: Recarga):
+        t = tema()
+        titulo_controles: list[ft.Control] = [
+            ft.Text(
+                f"recarga em {recarga.posto.nome}",
+                size=14,
+                weight=ft.FontWeight.W_600,
+                color=t.TEXTO,
+            )
+        ]
+
+        # if badge:
+        #     titulo_controles.append(
+        #         ft.Container(
+        #             bgcolor=Cores.PRIMARIO,
+        #             border_radius=5,
+        #             padding=4,
+        #             content=ft.Text(
+        #                 badge,
+        #                 size=8,
+        #                 color=Cores.TEXTO_PRIMARIO,
+        #                 weight=ft.FontWeight.BOLD,
+        #             ),
+        #         )
+        #     )
+
+        return ft.Container(
+            width=largura_conteudo(),
+            height=85,
+            bgcolor=t.CARD,
+            border_radius=12,
+            border=borda_all(1, t.CARD_BORDA),
+            shadow=ft.BoxShadow(
+                spread_radius=0,
+                blur_radius=14,
+                color=t.SOMBRA,
+                offset=ft.Offset(0, 4),
+            ),
+            ink=True,
+            # on_click=on_click,
+            padding=12,
+            content=ft.Row(
+                spacing=14,
+                vertical_alignment=ft.CrossAxisAlignment.CENTER,
+                controls=[
+                    # icone(simbolo, 44),
+                    ft.Image(src=recarga.posto.imagem, border_radius=10, width=80),
+                    ft.Column(
+                        expand=True,
+                        spacing=4,
+                        
+                        alignment=ft.MainAxisAlignment.CENTER,
+                        controls=[
+                            ft.Row(
+                                spacing=7,
+                                vertical_alignment=ft.CrossAxisAlignment.CENTER,
+                                controls=titulo_controles,
+                            ),
+                            ft.Text(
+                                f"valor: {recarga.preco:.2f}$",
+                                size=13,
+                                color=Cores.SUCESSO,
+                                max_lines=1,
+                                overflow=ft.TextOverflow.ELLIPSIS,
+                            ),
+                            ft.Text(
+                                f"energia abastecida: {recarga.quantidade:.2f}kW",
+                                size=11,
+                                color=Cores.TEXTO_SECUNDARIO,
+                                max_lines=1,
+                                overflow=ft.TextOverflow.ELLIPSIS,
+                            ),
+                            # ft.Text(
+                            #     f"data: {recarga.:.2f}kW",
+                            #     size=11,
+                            #     color=Cores.TEXTO_SECUNDARIO,
+                            #     max_lines=1,
+                            #     overflow=ft.TextOverflow.ELLIPSIS,
+                            # ),
+                        ],
+                    ),
+                    ft.Text(
+                        "*",
+                        size=26,
+                        color=t.ICONE_INATIVO,
+                    ),
+                ],
+            ),
+        )
 
     def card_opcao(
         simbolo,
@@ -280,7 +428,7 @@ def tela_pagamento():
         on_click=None,
     ):
         t = tema()
-        titulo_controles = [
+        titulo_controles: list[ft.Control] = [
             ft.Text(
                 titulo,
                 size=14,
@@ -298,7 +446,7 @@ def tela_pagamento():
                     content=ft.Text(
                         badge,
                         size=8,
-                        color=t.TEXTO_SOBRE_PRIMARIO,
+                        color=Cores.TEXTO_PRIMARIO,
                         weight=ft.FontWeight.BOLD,
                     ),
                 )
@@ -337,7 +485,7 @@ def tela_pagamento():
                             ft.Text(
                                 descricao,
                                 size=11,
-                                color=t.TEXTO_SECUNDARIO,
+                                color=Cores.TEXTO_SECUNDARIO,
                                 max_lines=1,
                                 overflow=ft.TextOverflow.ELLIPSIS,
                             ),
@@ -386,16 +534,26 @@ def tela_pagamento():
 
    
     # AÇÕES DOS MÉTODOS DE PAGAMENTO
-    
+    async def pagar(forma: str):
+        id = await ft.SharedPreferences().get("id")
+        requisicao.post_map_sem("pagar", {
+            "forma": forma,
+            "usuario": id
+        })
+        initRecargas()
 
-    def pagar_pix(e):
-        print("Método selecionado: PIX")
+    async def pagar_pix(e):
+        await pagar("pix")
+        alerta_sucesso("Pagamento com Pix efetuado")
+        # print("Método selecionado: PIX")
 
-    def pagar_cartao(e):
-        print("Método selecionado: Cartão de Crédito")
+    async def pagar_cartao(e):
+        await pagar("credito")
+        alerta_sucesso("Pagamento com cartão efetuado")
+        # print("Método selecionado: Cartão de Crédito")
 
     def ver_fatura(e):
-            print("Método selecionado: Fatura")
+        print("Método selecionado: Fatura")
   
 
     def informar_valor(e):
@@ -403,21 +561,28 @@ def tela_pagamento():
 
     
     # RECONSTRUIR
-    
+    requisicao = instanciar_request(Constantes.HOST.value)
+    defl: list[Recarga] = []
+    recargas, setRecargas = ft.use_state(defl)
+
+    def initRecargas():
+        setRecargas(requisicao.get_lista("/recargas/dividas" ,Recarga ))
+
+    ft.use_effect(initRecargas, [ ])
 
     def rebuild():
-        t = tema()
-        page.bgcolor = t.FUNDO
-        page.controls.clear()
+        Cores = tema()
+        page.bgcolor = Cores.FUNDO
+ 
 
         # Corpo central com os métodos de pagamento
         corpo = ft.Column(
-            horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-            spacing=0,
+            width=largura_conteudo(),
+            # horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+            spacing=12,
             controls=[
                 header(),
                 card_pagamento(),
-                ft.Container(height=20),
                 card_opcao(
                     "⚡",
                     "Pix",
@@ -425,22 +590,27 @@ def tela_pagamento():
                     badge="POPULAR",
                     on_click=pagar_pix,
                 ),
-                ft.Container(height=12),
+                
                 card_opcao(
                     "💳",
                     "Cartão de Crédito",
                     "Pagar na fatura",
                     on_click=pagar_cartao,
                 ),
-                ft.Container(height=12),
-                                card_opcao(
-                                    "🧾",
-                                    "ver fatura",
-                                    "faturas",
-                                    on_click=ver_fatura,
-                                ),
-              
+                # card_opcao(
+                #     "🧾",
+                #     "ver fatura",
+                #     "faturas",
+                #     on_click=ver_fatura,
+                # ),
                 
+                ft.Container(padding=ft.Padding.only(left=20), content=ft.Column( spacing=2, controls=[
+
+                    ft.Text("Dividas", size=25),
+                    ft.Text("todas as recargas aindas não pagas", color=Cores.TEXTO_SECUNDARIO, size=12),
+                ])),
+
+                ft.Column([card_recarga(recarga) for recarga in recargas]),
                 footer(),
             ],
         )
@@ -451,7 +621,7 @@ def tela_pagamento():
             spacing=0,
             horizontal_alignment=ft.CrossAxisAlignment.CENTER,
             controls=[
-                top_bar(),
+               
                 ft.Column(
                     expand=True,
                     horizontal_alignment=ft.CrossAxisAlignment.CENTER,
@@ -461,8 +631,8 @@ def tela_pagamento():
             ],
         )
 
-        return (principal)
-        page.update()
+        return principal
+        
 
     
     # RESPONSIVIDADE
@@ -477,12 +647,5 @@ def tela_pagamento():
     # INICIALIZAÇÃO
     
 
-    rebuild()
+    return rebuild()
 
-
-
-# START
-
-
-if __name__ == "__main__":
-    ft.run(main)

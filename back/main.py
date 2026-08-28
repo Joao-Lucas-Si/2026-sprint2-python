@@ -6,6 +6,8 @@ from app import app, socketio
 import src.controlers.usuarios
 import src.controlers.posto
 import src.controlers.ocpp
+import src.controlers.pagamento
+import src.controlers.recarga
 
 
 @app.route("/")

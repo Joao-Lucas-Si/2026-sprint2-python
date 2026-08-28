@@ -7,7 +7,9 @@ def App(page: ft.Page):
     aplicar_tema()
     page.padding = 0
     page.title="Elevo"
-    
+    def a():
+        page.update()
+    page.window.on_event = a
     return main_router()
 
 def main():

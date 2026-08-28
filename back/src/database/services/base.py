@@ -27,8 +27,10 @@ class BaseQuery[T](ABC):
         sessao = self._criar_sessao()
         
         sessao.add(linha)
-        
         sessao.commit()
+        sessao.refresh(linha)
+   
+        sessao.expunge(linha)
         sessao.close()
         
     def listarTodos(self) -> list[T]:
