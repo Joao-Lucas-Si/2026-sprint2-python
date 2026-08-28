@@ -91,10 +91,12 @@ void carregador()
     delay(500);
     LCD.clear();
   }
+
   LCD.setCursor(6, 3);
   LCD.print("Recarga");
   LCD.setCursor(5, 2);
   LCD.print("Terminada");
+  delay(1000);
 
   // delay(200);
   LCD.clear();
