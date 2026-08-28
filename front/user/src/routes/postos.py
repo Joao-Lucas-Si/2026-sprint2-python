@@ -52,17 +52,19 @@ class Posto(CorpoJson):
             carregador for carregador in self.carregadores if not carregador.ocupado
         ]
 
-    def __init__(self, id: int, nome: str, carregadores: list[Carregador], imagem: str, preco_medio: float) -> None:
+    def __init__(self, id: int, nome: str, carregadores: list[Carregador], imagem: str, descricao: str, local: str, preco_medio: float) -> None:
         super().__init__()
         self.id = id
         self.nome = nome
         self.carregadores = carregadores
         self.imagem = imagem
         self.preco_medio = preco_medio
+        self.descricao = descricao
+        self.local = local
 
     @staticmethod
     def instanciar(json: dict) -> Any:
-        return Posto(json["id"], json["nome"], list(map(lambda x: Carregador.instanciar(x), json["carregadores"])),  json["imagem"], json["preco_medio"])
+        return Posto(json["id"], json["nome"], list(map(lambda x: Carregador.instanciar(x), json["carregadores"])),  json["imagem"], json["descricao"], json["local"], json["preco_medio"])
 
 
 @ft.component
