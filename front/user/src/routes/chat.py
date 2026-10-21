@@ -1,17 +1,20 @@
 from datetime import datetime
 import flet as ft
 
-from front.user.src.utils.use_colors import usar_cores
+from src.constants import Constantes
+from src.utils.request.instanciar_request import instanciar_request
+from src.components.navbar import navbar
+from src.utils.use_colors import usar_cores
 
 # colors.FUNDO = "#121316"  # Fundo geral escuro
-SIDEBAR = "#1B1C22"  # Fundo da barra 
+SIDEBAR = "#1B1C22"  # Fundo da barra
 CARD_BG = "#23252E"  # Fundo dos cards
-# colors.PRIMARIO = "#FF452B"  # Laranja/vermelho 
+# colors.PRIMARIO = "#FF452B"  # Laranja/vermelho
 WHITE = "#FFFFFF"  # Tex principais
 # TEXT = "#E0E0E5"  # Tex normais
 MUTED = "#8E8F99"  # Tex secundários
 # colors.CARD_BORDA = "#2C2D38"  # Bordas discretas
-GREEN = "#27AE78"  #  online 
+GREEN = "#27AE78"  #  online
 BLUE = "#3B82F6"  #  suporte
 
 
@@ -24,7 +27,9 @@ def pad(left=0, top=0, right=0, bottom=0):
     )
 
 
-def main():
+@ft.component
+def chatbot():
+    page = ft.context.page
     # page.title = "Central de Suporte"
     # page.theme_mode = ft.ThemeMode.DARK
     # page.bgcolor = colors.FUNDO
@@ -34,39 +39,41 @@ def main():
     # page.window.height = 900
     # page.window.min_width = 950
     # page.window.min_height = 650
-
+    navbar()
     colors = usar_cores()
-
-    messages = [
-        {
-            "agent": True,
-            "name": "Suporte",
-            "text": (
-                "Olá, Tiago Assis!\n\n"
-                "Bem-vindo à nossa central de suporte. "
-                "Estou aqui para ajudar você."
-            ),
-            "time": "14:31",
-        },
-        {
-            "agent": True,
-            "name": "Suporte",
-            "text": (
-                "Para começarmos o seu atendimento, "
-                "escolha com qual equipe deseja falar:"
-            ),
-            "time": "66:66",
-        },
-    ]
+    current = datetime.now()
+    a, set_a = ft.use_state("")
+    messages, set_messages = ft.use_state(
+        [
+            {
+                "agent": True,
+                "name": "Suporte",
+                "text": (
+                    "Olá, sou o energyAi!\n\n"
+                    "Bem-vindo à nossa central de suporte. "
+                    "Estou aqui para ajudar você."
+                ),
+                "time": f"{current.hour}:{current.minute}",
+            },
+            # {
+            #     "agent": True,
+            #     "name": "Suporte",
+            #     "text": (
+            #         "Para começarmos o seu atendimento, "
+            #         "escolha com qual equipe deseja falar:"
+            #     ),
+            #     "time": f"{current.hour}:{current.minute}",
+            # },
+        ]
+    )
 
     selected_team = {"value": "Atendimento geral"}
     ticket_number = "SUP-2026-1042"
     closed = {"value": False}
 
-    
     #  AUXILIARES
-    
 
+    @ft.component
     def txt(value, size=12, color=colors.TEXTO, bold=False):
         return ft.Text(
             str(value),
@@ -81,12 +88,14 @@ def main():
     def close_dialog():
         ft.context.page.pop_dialog()
 
+    @ft.component
     def divider():
         return ft.Container(
             height=1,
             bgcolor=colors.CARD_BORDA,
         )
 
+    @ft.component
     def badge(value, fg=colors.PRIMARIO, bg="#2E1C20"):
         return ft.Container(
             bgcolor=bg,
@@ -95,10 +104,9 @@ def main():
             content=txt(value, 10, fg, True),
         )
 
-    
     # MENU LATERAL
-    
 
+    @ft.component
     def menu_item(icon, title, selected=False, count=None):
         items = [
             ft.Icon(
@@ -175,7 +183,6 @@ def main():
                     True,
                     8,
                 ),
-    
                 ft.Container(height=12),
                 txt("CATEGORIAS", 9, MUTED, True),
                 menu_item(
@@ -183,8 +190,6 @@ def main():
                     "Suporte técnico",
                     count=4,
                 ),
-                
-                
                 menu_item(
                     ft.Icons.PERSON_OUTLINED,
                     "Conta e acesso",
@@ -260,9 +265,7 @@ def main():
         ),
     )
 
-    
     # CABECALHO PRINCIPAL
-    
 
     search_top = ft.TextField(
         hint_text="Pesquisar atendimentos...",
@@ -320,9 +323,7 @@ def main():
         ),
     )
 
-    
     # CABECALHO DO CHAT
-    
 
     conversation_header = ft.Container(
         bgcolor=colors.FUNDO,
@@ -370,26 +371,15 @@ def main():
         ),
     )
 
-    
     # MENSAGENS
-    
 
-    chat_messages = ft.Column(
-        spacing=18,
-        scroll=ft.ScrollMode.AUTO,
-        expand=True,
-    )
-
+    @ft.component
     def message_bubble(message):
         agent = message["agent"]
 
         avatar = ft.CircleAvatar(
             content=ft.Icon(
-                (
-                    ft.Icons.SMART_TOY_OUTLINED
-                    if agent
-                    else ft.Icons.PERSON
-                ),
+                (ft.Icons.SMART_TOY_OUTLINED if agent else ft.Icons.PERSON),
                 size=18,
                 color=WHITE,
             ),
@@ -463,15 +453,13 @@ def main():
             vertical_alignment=ft.CrossAxisAlignment.START,
         )
 
-    def render_messages():
-        chat_messages.controls = [
-            message_bubble(message) for message in messages
-        ]
-        ft.context.page.update()
+    # def render_messages():
+    #     chat_messages.controls = [
 
-    
+    #     ]
+    # ft.context.page.update()
+
     # ESCOLHA DA EQUIPE
-    
 
     def choose_team(team=None):
         if closed["value"]:
@@ -507,11 +495,9 @@ def main():
             }
         )
 
-        render_messages()
+        # render_messages()
 
-    
     # OPÇÕES RÁPIDAS
-    
 
     def team_button(title, icon):
         return ft.Container(
@@ -574,9 +560,7 @@ def main():
         ),
     )
 
-    
     # CAMPO DE MENSAGEM
-    
 
     message_input = ft.TextField(
         hint_text="Digite sua mensagem.......",
@@ -598,36 +582,45 @@ def main():
         if not content:
             return
 
-        if closed["value"]:
-            notify("O atendimento está encerrado.")
-            return
+        # if closed["value"]:
+        #     notify("O atendimento está encerrado.")
+        #     return
 
         now = datetime.now().strftime("%H:%M")
 
         messages.append(
             {
                 "agent": False,
-                "name": "PINTOLA Assis",
+                "name": "usuario",
                 "text": content,
                 "time": now,
             }
         )
 
+        set_messages(lambda x: [*messages])
+        set_a(a + "a")
+
+        requisicao = instanciar_request(Constantes.HOST.value)
+
+
+        resposta = requisicao.post_dict_str("chat", {
+            "pergunta": content
+        })
+
         messages.append(
             {
                 "agent": True,
-                "name": "PINTOLINHA",
-                "text": (
-                    "Obrigado pelas informações! Sua mensagem "
-                    "foi registrada . "
-                    "Nossa equipe poderá analisar sua solicitação."
-                ),
+                "name": "assistente",
+                "text": resposta,
                 "time": now,
             }
         )
-
-        message_input.value = ""
-        render_messages()
+        # print(messages)
+        # message_input.value = ""
+        set_messages(lambda x: [*messages])
+        set_a(a + "a")
+        print("send")
+        # render_messages()
 
     composer = ft.Container(
         bgcolor=colors.FUNDO,
@@ -637,22 +630,22 @@ def main():
             controls=[
                 ft.Row(
                     controls=[
-                        ft.IconButton(
-                            icon=ft.Icons.ATTACH_FILE,
-                            icon_color=MUTED,
-                            tooltip="Anexar arquivo",
-                            on_click=lambda e: notify(
-                                "O envio de arquivos precisa de integração."
-                            ),
-                        ),
-                        ft.IconButton(
-                            icon=ft.Icons.IMAGE_OUTLINED,
-                            icon_color=MUTED,
-                            tooltip="Enviar imagem",
-                            on_click=lambda e: notify(
-                                "O envio de imagens precisa de integração."
-                            ),
-                        ),
+                        # ft.IconButton(
+                        #     icon=ft.Icons.ATTACH_FILE,
+                        #     icon_color=MUTED,
+                        #     tooltip="Anexar arquivo",
+                        #     on_click=lambda e: notify(
+                        #         "O envio de arquivos precisa de integração."
+                        #     ),
+                        # ),
+                        # ft.IconButton(
+                        #     icon=ft.Icons.IMAGE_OUTLINED,
+                        #     icon_color=MUTED,
+                        #     tooltip="Enviar imagem",
+                        #     on_click=lambda e: notify(
+                        #         "O envio de imagens precisa de integração."
+                        #     ),
+                        # ),
                         ft.Container(expand=True),
                         txt(
                             "Atendimento seguro",
@@ -694,10 +687,9 @@ def main():
         ),
     )
 
-    
     # PAINEL DE DETALHES
-    
 
+    @ft.component
     def detail_row(icon, title, value):
         return ft.Row(
             controls=[
@@ -735,9 +727,7 @@ def main():
             ft.AlertDialog(
                 modal=True,
                 title=ft.Text("Encerrar atendimento?"),
-                content=ft.Text(
-                    "Deseja realmente encerrar esta conversa?"
-                ),
+                content=ft.Text("Deseja realmente encerrar esta conversa?"),
                 actions=[
                     ft.TextButton(
                         "Cancelar",
@@ -927,74 +917,72 @@ def main():
         ),
     )
 
-    
     # PAINEL CENTRAL
-    
 
-    chat_area = ft.Container(
-        expand=True,
-        bgcolor=colors.FUNDO,
-        content=ft.Column(
-            controls=[
-                conversation_header,
-                ft.Container(
-                    expand=True,
-                    padding=pad(20, 20, 20, 20),
-                    content=ft.Column(
+    # MONTAGEM FINAL DA TELA
+
+    # render_messages()
+    print(messages)
+    return ft.Row(
+        controls=[
+            # sidebar,
+            ft.Column(
+                controls=[
+                    # header,
+                    ft.Row(
                         controls=[
                             ft.Container(
-                                alignment=ft.Alignment(0, 0),
-                                content=badge(
-                                    "HOJE · 14 DE OUTUBRO",
-                                    MUTED,
-                                    CARD_BG,
+                                expand=True,
+                                bgcolor=colors.FUNDO,
+                                content=ft.Column(
+                                    controls=[
+                                        conversation_header,
+                                        ft.Container(
+                                            expand=True,
+                                            padding=pad(20, 20, 20, 20),
+                                            content=ft.Column(
+                                                controls=[
+                                                    # ft.Container(
+                                                    #     alignment=ft.Alignment(0, 0),
+                                                    #     content=badge(
+                                                    #         "HOJE · 14 DE OUTUBRO",
+                                                    #         MUTED,
+                                                    #         CARD_BG,
+                                                    #     ),
+                                                    # ),
+                                                    ft.ListView(
+                                                        controls=[
+                                                            message_bubble(message)
+                                                            for message in messages
+                                                        ],
+                                                        spacing=18,
+                                                        scroll=ft.ScrollMode.AUTO,
+                                                        expand=True,
+                                                    ),
+                                                    # quick_options,
+                                                ],
+                                                spacing=20,
+                                                expand=True,
+                                            ),
+                                        ),
+                                        composer,
+                                    ],
+                                    spacing=0,
+                                    expand=True,
                                 ),
                             ),
-                            chat_messages,
-                            quick_options,
+                            # details_panel,
                         ],
-                        spacing=20,
+                        spacing=0,
                         expand=True,
+                        vertical_alignment=ft.CrossAxisAlignment.STRETCH,
                     ),
-                ),
-                composer,
-            ],
-            spacing=0,
-            expand=True,
-        ),
-    )
-
-    
-    # MONTAGEM FINAL DA TELA
-    
-
-    main_content = ft.Column(
-        controls=[
-            header,
-            ft.Row(
-                controls=[
-                    chat_area,
-                    details_panel,
                 ],
                 spacing=0,
                 expand=True,
-                vertical_alignment=ft.CrossAxisAlignment.STRETCH,
             ),
         ],
         spacing=0,
         expand=True,
+        vertical_alignment=ft.CrossAxisAlignment.STRETCH,
     )
-
-    page.add(
-        ft.Row(
-            controls=[
-                sidebar,
-                main_content,
-            ],
-            spacing=0,
-            expand=True,
-            vertical_alignment=ft.CrossAxisAlignment.STRETCH,
-        )
-    )
-
-    render_messages()

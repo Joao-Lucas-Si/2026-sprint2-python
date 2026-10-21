@@ -2,3 +2,10 @@ sqlalchemy
 Flask
 flask-socketio
 pydantic
+google-genai
+python-dotenv
+langchain
+langchain-ollama
+langchain-google-genai
+langchain_classic
+tiktoken

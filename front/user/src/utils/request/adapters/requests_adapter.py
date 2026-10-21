@@ -24,6 +24,11 @@ class RequestsAdapter(HttpRequest):
 
         return list(map(lambda x: data.instanciar(x), json))
 
+    def post_dict_str(self, caminho: str, data: dict) -> str:
+        resposta = requests.post(self.caminhoFinal(caminho), json=data)
+
+        return resposta.text
+
     def post_sem(self, caminho: str, data: T) -> None:
         requests.post(self.caminhoFinal(caminho), json=data.converter())
 

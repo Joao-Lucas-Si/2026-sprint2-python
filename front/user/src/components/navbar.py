@@ -26,6 +26,7 @@ def navbar():
                 # ft.Icon(ft.Icons.MAP_OUTLINED, color=Cores.TEXTO),
                 ft.GestureDetector( on_tap=lambda : page.navigate("/postos"), content=ft.Icon(ft.Icons.EV_STATION, color=Cores.TEXTO)),
                 ft.GestureDetector( on_tap=lambda : page.navigate("/pagamento"),content= ft.Icon(ft.Icons.ATTACH_MONEY, color=Cores.TEXTO)),
+                ft.GestureDetector( on_tap=lambda : page.navigate("/chat"),content= ft.Icon(ft.Icons.CHAT, color=Cores.TEXTO)),
                 # ft.Icon(ft.Icons.HISTORY, color=Cores.TEXTO),
                 ft.GestureDetector( on_tap=deslogar, content=ft.Icon(ft.Icons.PERSON_OUTLINE, color=Cores.TEXTO)),
             ],

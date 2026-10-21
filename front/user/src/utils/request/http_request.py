@@ -50,6 +50,8 @@ class HttpRequest(ABC):
     def get_entidade(self, caminho: str, data: type[T]) -> T:
         pass
 
+
+
     @abstractmethod
     def get_lista(self, caminho: str, data: type[T]) -> list[T]:
         pass
@@ -61,6 +63,11 @@ class HttpRequest(ABC):
     @abstractmethod
     def post_map_sem(self, caminho: str, data: dict) -> None:
         pass
+
+    @abstractmethod
+
+    def post_dict_str(self, caminho: str, data: dict) -> str: ...
+
     
     @abstractmethod
     def post_map(self, caminho: str, data: dict, resposta: type[T]) -> T:

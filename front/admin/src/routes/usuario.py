@@ -40,4 +40,4 @@ def UsuarioTabela():
                 "valor": x.email
             }
         }
-    ], "usuario", "usuarios", "usuarios")
+    ], "usuario", "usuarios/form", "usuarios")

@@ -9,6 +9,7 @@ import src.controlers.ocpp
 import src.controlers.pagamento
 import src.controlers.carregadores
 import src.controlers.recarga
+import src.controlers.ai
 
 
 @app.route("/")
