@@ -1,9 +1,9 @@
 import flet as ft
 
+from src.dados import Carregador, Posto
 from src.components.alerta_erro import alerta_erro
 from src.components.cabecalho import criarCabecalho
 from src.constants import Constantes, EstiloConstantes
-from src.routes.postos import Posto, Carregador
 from src.utils.request.instanciar_request import instanciar_request
 from src.utils.use_colors import usar_cores
 

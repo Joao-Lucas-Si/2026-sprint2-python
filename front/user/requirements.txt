@@ -1,5 +1,7 @@
-flet
-flet-web
+flet==1.0.2
+flet-desktop==1.0.2
+flet-cli==1.0.2
+flet-web==1.0.2
 requests
 websocket-client
 python-socketio[asyncio_client]

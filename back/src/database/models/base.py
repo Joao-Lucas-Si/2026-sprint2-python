@@ -20,7 +20,7 @@ class BaseModel(Base):
     data_atualizacao: Mapped[datetime] = mapped_column(server_default=func.now(), onupdate=func.now()) 
     
     
-    def json(self) -> dict:
+    def json(self, direto: bool = True) -> dict:
         return {
             "id": self.id,
             "status": self.status.value

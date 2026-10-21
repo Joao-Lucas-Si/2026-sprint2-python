@@ -2,6 +2,7 @@ from src.routes.config_tema import aplicar_tema
 from src.routes.router.main_router import main_router
 from src.messages.utils import obterTextos
 import flet as ft
+
 @ft.component
 def App(page: ft.Page):
     aplicar_tema()

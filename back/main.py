@@ -7,6 +7,7 @@ import src.controlers.usuarios
 import src.controlers.posto
 import src.controlers.ocpp
 import src.controlers.pagamento
+import src.controlers.carregadores
 import src.controlers.recarga
 
 

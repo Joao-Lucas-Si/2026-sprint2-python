@@ -1,8 +1,8 @@
 from typing import Any
 
 import flet as ft
+from src.dados import Recarga
 from src.components.alerta_erro import alerta_sucesso
-from src.routes.postos import Carregador, Posto
 from src.constants import Constantes
 from src.utils.request.http_request import CorpoJson
 from src.utils.request.instanciar_request import instanciar_request
@@ -14,22 +14,6 @@ def borda_all(width, color):
 
 # APLICAÇÃO
 
-class Recarga(CorpoJson):
-    preco_kwh: float
-    preco: float
-    quantidade: float
-    carregador: Carregador
-    posto: Posto
-
-    @staticmethod
-    def instanciar(json: dict) -> Any:
-        recarga = Recarga()
-
-        recarga.preco = json["preco"]
-        recarga.quantidade = json["quantidade"]
-        recarga.preco_kwh = json["preco_kwh"]
-        recarga.posto = Posto.instanciar(json["posto"])
-        return recarga
 
 @ft.component
 def tela_pagamento():

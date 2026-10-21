@@ -2,7 +2,7 @@ import flet as ft
 from src.utils.status_config import status_config
 from src.components.navbar import navbar
 from src.constants import Constantes
-from src.routes.postos import Carregador, Posto
+from src.dados import Carregador, Posto
 from src.utils.request.instanciar_request import instanciar_request
 from src.utils.use_colors import usar_cores
  

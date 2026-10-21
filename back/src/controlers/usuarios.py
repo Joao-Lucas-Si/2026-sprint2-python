@@ -3,7 +3,16 @@ from flask import jsonify, request
 from app import app
 from src.database.models.usuario import Usuario
 from src.database.services.usuario import UsuarioQuery
+from src.controlers.base import base_endpoints
 
+def setUsuarioAttr(instancia: Usuario, dados: dict):
+    instancia.email = dados["email"]
+    instancia.nome = dados["nome"]
+    if "senha" in instancia.senha:
+        instancia.senha = dados["senha"]
+    # instancia.
+    
+app.register_blueprint(base_endpoints("usuarios", setUsuarioAttr, lambda : Usuario(), UsuarioQuery()))
 
 @app.route("/cadastro", methods = ["POST"])
 def cadastro():

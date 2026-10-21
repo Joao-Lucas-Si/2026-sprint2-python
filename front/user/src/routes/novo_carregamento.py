@@ -1,6 +1,6 @@
 import flet as ft
+from src.dados import Carregador, Posto
 from src.constants import Constantes
-from src.routes.postos import Carregador, Posto
 from src.utils.request.instanciar_request import instanciar_request
 from src.utils.use_colors import usar_cores
 
@@ -230,7 +230,7 @@ def carregamento():
         energia = converter_preco_para_energia(valor, carregador) if modo else valor
         preco = converter_energia_para_preco(valor, carregador) if not modo else valor
         id = await ft.SharedPreferences().get("id")
-        requisicao.post_map_sem("/recargas/add", {
+        requisicao.post_map_sem("/recargas/adicionar", {
             "usuario": id,
             "preco": preco,
             "quantidade": energia,

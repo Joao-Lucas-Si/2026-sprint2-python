@@ -11,7 +11,7 @@ class UsuarioQuery(BaseQuery):
         
         data = sessao.query(Usuario).where(Usuario.email == email, Usuario.senha == senha).one_or_none()
         
-        sessao.close()
+        # sessao.close()
         
         return data
     
@@ -20,6 +20,6 @@ class UsuarioQuery(BaseQuery):
         
         data = sessao.query(Usuario).where(Usuario.email == email).one_or_none()
         
-        sessao.close()
+        # sessao.close()
         
         return data

@@ -1,4 +1,6 @@
+import datetime
 from pydantic import Field
+from src.database.models.usuario import Usuario
 from sqlalchemy import ForeignKey
 
 from src.database.models.carregador import Carregador
@@ -31,13 +33,18 @@ class Recarga(BaseModel):
     # energia_utilizada: Mapped[int] = mapped_column()
     quantidade: Mapped[int] = mapped_column()
     pagamento_id: Mapped[int] = mapped_column(ForeignKey("pagamentos.id"), nullable=True)
+    usuario: Mapped["Usuario"] = relationship(lazy="subquery")
+    posto: Posto|None = Field(default=None)
 
-    posto: Posto|None = Field()
-    def json(self) -> dict:
+    def json(self, direto = True) -> dict:
+        self.posto = self.carregador.posto
+        # datetime.datetime.now()
         return {
+            "data": self.data_criacao.isoformat(),
             "preco": self.preco,
             "preco_kwh": self.preco_kwh,
             "quantidade": self.quantidade,
             "id": self.id,
-            "posto": self.posto.json() if self.posto else None
+            "usuario": self.usuario.json(False),
+            "posto": self.posto.json(False) if self.posto else None
         }

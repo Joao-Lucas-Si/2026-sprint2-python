@@ -1,11 +1,16 @@
+import typing
+
 from sqlalchemy import ForeignKey
 
 
 # from src.database.models.posto import Posto
+# 
 from src.database.models.base import BaseModel
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-
 # from back.src.database.models.posto import Posto
+
+if typing.TYPE_CHECKING:
+  from src.database.models.posto import Posto
 
 class Carregador(BaseModel):
     __tablename__="carregadores"
@@ -14,7 +19,8 @@ class Carregador(BaseModel):
     ocupado: Mapped[bool] = mapped_column()
     preco: Mapped[float] = mapped_column()
     posto_id: Mapped[int] = mapped_column(ForeignKey("postos.id"))
-    # posto: Mapped[Posto] = relationship(subquery="lazy") 
+    posto: Mapped["Posto"] = relationship(lazy="subquery")
+
     @staticmethod
     def instanciar(capacidade: int, disponivel: int, preco: float, ocupado: bool):
         instancia = Carregador()
@@ -26,15 +32,18 @@ class Carregador(BaseModel):
     
         return instancia 
         
-    def json(self):
-        return {
+    def json(self, direto: bool = True):
+        dic = {
             "capacidade": self.capacidade,
             "disponivel": self.disponivel,
             "ocupado": self.ocupado,
             "preco": self.preco,
-            "id": self.id
+            "postoId": self.posto_id,
+            **super().json(),
         }
-
+        if direto:
+            dic["posto"] = self.posto.nome
+        return dic
 
 
     # posto: Mapped["Posto"] = relationship(back_populates="carregadores")

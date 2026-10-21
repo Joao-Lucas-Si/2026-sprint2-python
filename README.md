@@ -19,7 +19,8 @@ ative o ambiente python se atentando ao sistema operacioanl usado, e instale as 
 ```
 # para linux
 source venv/bin/activate
-# para wnindows
+
+# para windows
 ./venv/Scripts/Activate.ps1
 
 cd back
@@ -31,7 +32,7 @@ cd ../front/user
 pip install -r requirements.txt
 ```
 
-agora, será necessário ter quatro terminais, no primerio terminal, o que você já esta utilizando, rode o script do frontend, já no segundo, ative o ambiente python e entre na pasta back e rode o backend
+agora, será necessário ter cinco terminais, no primerio terminal, o que você já esta utilizando, rode o script do frontend, já no segundo, ative o ambiente python e entre na pasta back e rode o backend
 
 
 ## primerio terminal
@@ -97,3 +98,19 @@ cd hardware/Wokwi/intermediarios
 ```
 
 agora, com o intermediario rodando, entre no arquvio diagram.json e rode o hardware
+
+## quinto terminal
+
+o quinto terminal rodará o aplicativo feito para administradores, invés do focado para usuários, basta ativar o embiente, entrar na pasta certa e rodar
+
+
+```
+# para linux
+source venv/bin/activate
+# para wnindows
+./venv/Scripts/Activate.ps1
+
+cd front/admin
+
+flet run main.py
+```
