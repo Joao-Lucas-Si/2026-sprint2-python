@@ -1,7 +1,8 @@
+from src.hooks.use_is_admin import use_is_admin
 from src.dados import Carregador, Posto, Recarga, Usuario
 from src.constants import Constantes
 from src.utils.request.instanciar_request import instanciar_request
-import flet
+import flet as ft
 
 MENU_ADMIN = [
     {"rota": "/dashboard", "rotulo": "Dashboard", "icone": "DASHBOARD_OUTLINED"},
@@ -93,10 +94,16 @@ def obter_recarga(id):
 
 
 def obter_carregadores():
-    requisicao = instanciar_request(Constantes.HOST.value)
+    carregadores, setCarregadores = ft.use_state([])
+  
+    async def obter():
+        preferences = ft.SharedPreferences()
+        isAdmin = await preferences.get("admin.role") == "admin"
+        id = await preferences.get("admin.id")
+        requisicao = instanciar_request(Constantes.HOST.value)
 
-    carregadores = requisicao.get_lista("carregadores", Carregador)
-
+        setCarregadores(requisicao.get_lista(f"carregadores/admin/{id}" if not isAdmin else "carregadores", Carregador))
+    ft.on_mounted(obter)
     return carregadores
 
 
@@ -151,14 +158,21 @@ def obter_ultimas_recargas():
 
 
 def obter_postos():
-    requisicao = instanciar_request(Constantes.HOST.value)
+    postos, setPostos = ft.use_state([])
+  
+    async def obter():
+        preferences = ft.SharedPreferences()
+        isAdmin = await preferences.get("admin.role") == "admin"
+        id = await preferences.get("admin.id")
+        requisicao = instanciar_request(Constantes.HOST.value)
 
-    carregadores = requisicao.get_lista("postos", Posto)
-    return carregadores
+        setPostos(requisicao.get_lista(f"postos/admin/{id}" if not isAdmin else "postos", Posto))
+    ft.on_mounted(obter)
+    return postos
     # status: "disponivel" | "ocupado" | "manutencao"
     # return [
     #     {"id": 1, "nome": "posto shopping tamboré", "local": "Av. Paulista, São Paulo", "carregadores": 8, "preco": 1.20, "status": "disponivel"},
-    #     {"id": 2, "nome": "posto do aeroporto", "local": "Guarulhos, São Paulo", "carregadores": 6, "preco": 1.25, "status": "ocupado"},
+    #     {"id": 2, "nome": "posto do aeroporto", "local": "Guarulhos, São Pauslo", "carregadores": 6, "preco": 1.25, "status": "ocupado"},
     #     {"id": 3, "nome": "posto ipiranga", "local": "Zona Sul, São Paulo", "carregadores": 10, "preco": 0.77, "status": "disponivel"},
     #     {"id": 4, "nome": "Posto do villa lobos", "local": "IRINEU vc não sabe nem eu", "carregadores": 4, "preco": 1.35, "status": "manutencao"},
     #     {"id": 5, "nome": "Recarga Pinheiros", "local": "Pinheiros, São Paulo", "carregadores": 5, "preco": 1.25, "status": "disponivel"},

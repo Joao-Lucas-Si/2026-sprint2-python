@@ -12,7 +12,6 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 
 class LangChainAdapter(AiAdapter):
     def __init__(self) -> None:
-        print(os.getenv("CHAVE_GEMINI"))
         self.model = ChatGoogleGenerativeAI(
             model="gemini-3-flash-preview",
             api_key=os.getenv("CHAVE_GEMINI"),

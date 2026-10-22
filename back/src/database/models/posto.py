@@ -28,6 +28,7 @@ class Posto(BaseModel):
             "preco_medio": self.preco_medio,
             "local": self.local,
             "descricao": self.descricao,
+            "dono_id": self.dono_id
             
         }
         if direto:

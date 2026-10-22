@@ -12,10 +12,12 @@ from src.utils.use_colors import usar_cores
 
 class LoginResposta(CorpoJson):
     id: int
+    role: str
     
     def converter(self) -> dict:
         return {
-            "id": self.id
+            "id": self.id,
+            "role": self.role
         }
         
     @staticmethod
@@ -23,6 +25,7 @@ class LoginResposta(CorpoJson):
         resposta = LoginResposta()
         
         resposta.id = json["id"]
+        resposta.role = json["role"]
         
         return resposta
 
@@ -33,7 +36,8 @@ def login():
     page.appbar = None
     page.update()
     async def redirecionar():
-        id = await ft.SharedPreferences().get("id")
+        id = await ft.SharedPreferences().get("admin.id")
+    
         if not id is None:
             page.navigate("/dashboard")
             page.update()
@@ -53,7 +57,7 @@ def login():
                 "senha": password.value
             }
             
-            resposta = requisicao.post_map("login", credenciais, LoginResposta)
+            resposta = requisicao.post_map("admin-login", credenciais, LoginResposta)
             
             if resposta.id == -1:
                 snackbar = ft.SnackBar(
@@ -64,7 +68,8 @@ def login():
                 page.overlay.append(snackbar)
                 page.update()
             else:
-                await ft.SharedPreferences().set("id", resposta.id)
+                await ft.SharedPreferences().set("admin.id", resposta.id)
+                await ft.SharedPreferences().set("admin.role", resposta.role)
                 
                 page.navigate("/postos")
                 # page.update()
@@ -97,28 +102,7 @@ def login():
         on_click=on_sucess_login,
     )
 
-    Button_cadastro = ft.TextButton(
-        content=ft.Text(
-            spans=[
-                ft.TextSpan(
-                    "Não tem uma Conta? ",
-                    style=ft.TextStyle(
-                        
-                        size=14,
-                    ),
-                ),
-                ft.TextSpan(
-                    "Cadastre-se",
-                    style=ft.TextStyle(
-                        color=Cores.PRIMARIO_CLARO,
-                        size=14,
-                        weight=ft.FontWeight.BOLD,
-                    ),
-                ),
-            ],
-        ),
-        on_click=lambda e: ft.context.page.navigate("/cadastro"),
-    )
+
 
     return ft.Container(
             image=ft.DecorationImage(
@@ -127,7 +111,7 @@ def login():
             expand=True,
             alignment=ft.Alignment(0, 0),
             content=ft.Column(
-                controls=[username, password, button_login, Button_cadastro],
+                controls=[username, password, button_login],
                 alignment=ft.MainAxisAlignment.CENTER,
                 horizontal_alignment=ft.CrossAxisAlignment.CENTER,
             ),

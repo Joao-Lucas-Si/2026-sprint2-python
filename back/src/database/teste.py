@@ -6,6 +6,14 @@ from src.database.services.posto import PostoQuery
 
 
 def exemplos():
+    usuario2 = Usuario()
+    usuario2.nome = "leonardo"
+    usuario2.senha = "2899"
+    usuario2.email = "donarleo@proton.me"
+    usuario2.role = "admin"
+
+    UsuarioQuery().adicionar(usuario2)
+
     usuario1 = Usuario()
     usuario1.email = "artur@proton.me"
     usuario1.nome = "artur"

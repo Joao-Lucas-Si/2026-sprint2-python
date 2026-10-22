@@ -13,10 +13,19 @@ def setPostoAttr(instancia: Posto, dados: dict):
     instancia.imagem = dados["imagem"]
     instancia.local = dados["local"]
     instancia.nome = dados["nome"]
+    instancia.dono_id = dados["dono_id"]
     # instancia.
     
 
 app.register_blueprint(base_endpoints("postos", setPostoAttr, lambda : Posto(), PostoQuery()))
+
+@app.route(f"/postos/admin/<int:id>")
+def listagemDono(id):
+    query = PostoQuery()
+
+    postos = query.listarPorDono(id)
+
+    return jsonify([p.json() for p in postos])
 
 # @app.route("/postos", methods = ["GET"])
 # def lister_postos():

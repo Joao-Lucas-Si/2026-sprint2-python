@@ -114,3 +114,9 @@ cd front/admin
 
 flet run main.py
 ```
+
+fora do terminal, crie um arquivo .env dentro da pasta back e informe sua chave da api do gemini seguindo a estrutura abaixo
+
+```
+CHAVE_GEMINI=<sua chave>
+```

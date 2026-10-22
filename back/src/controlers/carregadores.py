@@ -16,7 +16,13 @@ def setAttr(instancia: Carregador, dados: dict):
 app.register_blueprint(base_endpoints("carregadores", setAttr, lambda : Carregador(),  CarregadorQuery()))
 
 
+@app.route(f"/carregadores/admin/<int:id>")
+def listagemCarregadoresDono(id):
+    query = CarregadorQuery()
 
+    carregadores = query.listarPorDono(id)
+
+    return jsonify([p.json() for p in carregadores])
 # @app.route("/carregadores", methods = ["GET"])
 # def listar_carregadores():
 #     query = CarregadorQuery()

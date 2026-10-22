@@ -8,7 +8,8 @@ from src.controlers.base import base_endpoints
 def setUsuarioAttr(instancia: Usuario, dados: dict):
     instancia.email = dados["email"]
     instancia.nome = dados["nome"]
-    if "senha" in instancia.senha:
+    instancia.role = dados["role"]
+    if "senha" in dados:
         instancia.senha = dados["senha"]
     # instancia.
     
@@ -65,4 +66,26 @@ def login():
         
     return jsonify({
         "id": -1
+    })
+
+@app.route("/admin-login", methods = ["POST"])
+def adminLogin():
+    dados = request.get_json()
+    email = dados["email"]
+    senha = dados["senha"]
+
+    query = UsuarioQuery()
+   
+
+    usuario = query.adminLogin(email, senha)
+
+    if usuario:
+        return jsonify({
+            "id": usuario.id,
+            "role": usuario.role
+        })
+        
+    return jsonify({
+        "id": -1,
+        "role": ""
     })

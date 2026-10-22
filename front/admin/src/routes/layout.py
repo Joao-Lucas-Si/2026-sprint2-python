@@ -5,7 +5,10 @@ Dashboard e Postos NÃO repetem a sidebar. O Router renderiza este
 componente em volta delas (rota de layout) e ele encaixa a tela atual
 na área de conteúdo com `use_route_outlet()`.
 """
+import asyncio
+
 import flet as ft
+from src.hooks.use_is_admin import use_is_admin
 from src.utils.use_colors import usar_cores
 from src.routes.dados import MENU_ADMIN
 
@@ -52,28 +55,30 @@ def construir_sidebar(rota_atual: str, ao_navegar, notificacoes_nao_lidas: int =
     itens = []
     Cores = usar_cores()
     T = usar_cores()
+    is_admin = use_is_admin()
     for item in MENU_ADMIN:
-        linha = item_menu(item, _rota_ativa( item["rota"]), ao_navegar)
-        if item["rota"] == "/admin/notificacoes" and notificacoes_nao_lidas:
-            linha = ft.Stack(
-                controls=[
-                    linha,
-                    ft.Container(
-                        right=12,
-                        top=13,
-                        bgcolor=Cores.PRIMARIO_ESCURO,
-                        border_radius=10,
-                        padding=ft.Padding.symmetric(horizontal=7, vertical=1),
-                        content=ft.Text(
-                            str(notificacoes_nao_lidas),
-                            size=11,
-                            weight=ft.FontWeight.BOLD,
-                            color=T.TEXTO_PRIMARIO,
+        if not "isAdmin" in item or (item["isAdmin"] == True and is_admin):
+            linha = item_menu(item, _rota_ativa( item["rota"]), ao_navegar)
+            if item["rota"] == "/admin/notificacoes" and notificacoes_nao_lidas:
+                linha = ft.Stack(
+                    controls=[
+                        linha,
+                        ft.Container(
+                            right=12,
+                            top=13,
+                            bgcolor=Cores.PRIMARIO_ESCURO,
+                            border_radius=10,
+                            padding=ft.Padding.symmetric(horizontal=7, vertical=1),
+                            content=ft.Text(
+                                str(notificacoes_nao_lidas),
+                                size=11,
+                                weight=ft.FontWeight.BOLD,
+                                color=T.TEXTO_PRIMARIO,
+                            ),
                         ),
-                    ),
-                ]
-            )
-        itens.append(linha)
+                    ]
+                )
+            itens.append(linha)
 
     topo = ft.Row(
         spacing=12,
@@ -96,10 +101,16 @@ def construir_sidebar(rota_atual: str, ao_navegar, notificacoes_nao_lidas: int =
         ],
     )
 
+    def logout(e):
+        ft.context.page.run_task(ft.SharedPreferences().remove, "admin.id")
+        ao_navegar("/")
+        print("vack")
+
+
     rodape = item_menu(
         {"rota": "/", "rotulo": "Sair", "icone": "LOGOUT"},
         ativo=False,
-        ao_clicar=ao_navegar,
+        ao_clicar=logout,
     )
 
     return ft.Container(

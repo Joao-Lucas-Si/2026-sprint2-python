@@ -12,6 +12,7 @@ from src.routes.usuario import UsuarioTabela, UsuarioForm
 def main_router():
     return ft.Router(
         [
+            ft.Route(index=True, component=login),
             ft.Route(
                 component=AdminLayout,
                 outlet=True,

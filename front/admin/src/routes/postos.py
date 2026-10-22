@@ -189,6 +189,14 @@ from src.routes.dados import obter_posto, obter_postos
 
 @ft.component
 def PostoForm():
+    posto, set_posto = ft.use_state(Posto(0, "", [], "", "", "", 0))
+
+    async def on_mount():
+        id = await ft.SharedPreferences().get("admin.id")
+        novo = Posto(0, "", [], "", "", "", 0, id)
+        set_posto(novo)
+
+    ft.on_mounted(on_mount)
     return BaseForm(
         [
             [
@@ -223,7 +231,7 @@ def PostoForm():
                 }
             ],
         ],
-        Posto(1, "", [], "", "", "", 0),
+        posto,
         obter_posto,
         "postos"
     )

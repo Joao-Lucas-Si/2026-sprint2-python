@@ -21,6 +21,27 @@ def UsuarioForm():
                 "icon": ft.Icons.EMAIL,
                 "get": lambda x: x.email,
                 "set": lambda x, y: x.set_email(y)
+            },
+            
+        ],
+        [
+            {
+                "label": "senha",
+                "icon": ft.Icons.PASSWORD,
+                "get": lambda x: "",
+                "set": lambda x, y: x.set_senha(y)
+            },
+            {
+                "label": "role",
+                "icon": ft.Icons.SECURITY,
+                "get": lambda x: x.role,
+                "set": lambda x, y: x.set_role(y),
+                "opcoes": [
+                    ("usuario","usuario"),
+                    ("admin","admin"),
+                    ("dono","dono")
+                ],
+                "tipo": "selecao"
             }
         ]
     ], Usuario(), lambda x: obter_usuario(x), "usuarios")

@@ -7,7 +7,7 @@ def App(page: ft.Page):
     aplicar_tema()
     page.padding = 0
     page.title="Elevo"
-    print(page.route)
+    # print(page.route)
     # if page.route == "/" or page.route == "":
     #     page.navigate("/dashboard")
 
