@@ -141,189 +141,6 @@ def chatbot():
             on_click=lambda e: notify(f"Seção selecionada: {title}"),
         )
 
-    sidebar = ft.Container(
-        width=225,
-        bgcolor=SIDEBAR,
-        padding=pad(16, 18, 16, 16),
-        content=ft.Column(
-            controls=[
-                ft.Row(
-                    controls=[
-                        ft.Container(
-                            width=40,
-                            height=40,
-                            bgcolor=colors.PRIMARIO,
-                            border_radius=10,
-                            alignment=ft.Alignment(0, 0),
-                            content=ft.Icon(
-                                ft.Icons.HEADSET_MIC,
-                                color=WHITE,
-                                size=23,
-                            ),
-                        ),
-                        ft.Column(
-                            controls=[
-                                txt("SupportDesk", 16, WHITE, True),
-                                txt(
-                                    "CENTRAL DE ATENDIMENTO",
-                                    8,
-                                    MUTED,
-                                ),
-                            ],
-                            spacing=3,
-                        ),
-                    ],
-                    spacing=10,
-                ),
-                ft.Container(height=20),
-                txt("MENU PRINCIPAL", 9, MUTED, True),
-                menu_item(
-                    ft.Icons.INBOX_OUTLINED,
-                    "Meus atendimentos",
-                    True,
-                    8,
-                ),
-                ft.Container(height=12),
-                txt("CATEGORIAS", 9, MUTED, True),
-                menu_item(
-                    ft.Icons.COMPUTER_OUTLINED,
-                    "Suporte técnico",
-                    count=4,
-                ),
-                menu_item(
-                    ft.Icons.PERSON_OUTLINED,
-                    "Conta e acesso",
-                ),
-                menu_item(
-                    ft.Icons.LIGHTBULB_OUTLINE,
-                    "Dúvidas gerais",
-                ),
-                ft.Container(expand=True),
-                ft.Container(
-                    bgcolor=CARD_BG,
-                    border_radius=10,
-                    padding=pad(12, 14, 12, 14),
-                    border=ft.Border.all(1, colors.CARD_BORDA),
-                    content=ft.Column(
-                        controls=[
-                            ft.Row(
-                                controls=[
-                                    ft.Icon(
-                                        ft.Icons.HEADSET_MIC,
-                                        color=colors.PRIMARIO,
-                                        size=19,
-                                    ),
-                                    txt(
-                                        "Precisa de ajuda?",
-                                        11,
-                                        WHITE,
-                                        True,
-                                    ),
-                                ],
-                                spacing=8,
-                            ),
-                            txt(
-                                "Nossa equipe está disponível para ajudar você.",
-                                10,
-                                MUTED,
-                            ),
-                            ft.Button(
-                                content="Abrir atendimento",
-                                on_click=lambda e: choose_team(),
-                            ),
-                        ],
-                        spacing=10,
-                    ),
-                ),
-                divider(),
-                ft.Row(
-                    controls=[
-                        ft.CircleAvatar(
-                            content=ft.Text("TA", size=11, color=WHITE),
-                            bgcolor=colors.PRIMARIO,
-                            radius=18,
-                        ),
-                        ft.Column(
-                            controls=[
-                                txt("Tiago Assis", 11, WHITE, True),
-                                txt("Cliente", 10, MUTED),
-                            ],
-                            spacing=3,
-                        ),
-                        ft.Container(expand=True),
-                        ft.Icon(
-                            ft.Icons.SETTINGS_OUTLINED,
-                            color=MUTED,
-                            size=18,
-                        ),
-                    ],
-                    spacing=9,
-                ),
-            ],
-            spacing=9,
-            expand=True,
-        ),
-    )
-
-    # CABECALHO PRINCIPAL
-
-    search_top = ft.TextField(
-        hint_text="Pesquisar atendimentos...",
-        prefix=ft.Icon(
-            ft.Icons.SEARCH,
-            size=17,
-            color=MUTED,
-        ),
-        width=250,
-        height=42,
-        text_size=11,
-        border_radius=8,
-        border_color=colors.CARD_BORDA,
-        bgcolor=CARD_BG,
-        content_padding=pad(10, 8, 10, 8),
-    )
-
-    header = ft.Container(
-        bgcolor=colors.FUNDO,
-        padding=pad(22, 13, 22, 13),
-        border=ft.Border(bottom=ft.BorderSide(1, colors.CARD_BORDA)),
-        content=ft.Row(
-            controls=[
-                ft.Column(
-                    controls=[
-                        txt(
-                            "Central de atendimento",
-                            18,
-                            WHITE,
-                            True,
-                        ),
-                        txt(
-                            "Estamos aqui para ajudar você.",
-                            11,
-                            MUTED,
-                        ),
-                    ],
-                    spacing=4,
-                    expand=True,
-                ),
-                search_top,
-                ft.IconButton(
-                    icon=ft.Icons.NOTIFICATIONS_NONE,
-                    icon_color=MUTED,
-                    tooltip="Notificações",
-                    on_click=lambda e: notify("Você não tem novas notificações."),
-                ),
-                ft.CircleAvatar(
-                    content=ft.Text("TA", size=11, color=WHITE),
-                    bgcolor=colors.PRIMARIO,
-                    radius=18,
-                ),
-            ],
-            vertical_alignment=ft.CrossAxisAlignment.CENTER,
-        ),
-    )
-
-    # CABECALHO DO CHAT
 
     conversation_header = ft.Container(
         bgcolor=colors.FUNDO,
@@ -452,115 +269,6 @@ def chatbot():
             spacing=10,
             vertical_alignment=ft.CrossAxisAlignment.START,
         )
-
-    # def render_messages():
-    #     chat_messages.controls = [
-
-    #     ]
-    # ft.context.page.update()
-
-    # ESCOLHA DA EQUIPE
-
-    def choose_team(team=None):
-        if closed["value"]:
-            notify("Este atendimento foi encerrado.")
-            return
-
-        if team is None:
-            team = selected_team["value"]
-
-        selected_team["value"] = team
-        now = datetime.now().strftime("%H:%M")
-
-        messages.append(
-            {
-                "agent": False,
-                "name": "Tiago Assis",
-                "text": f"Quero falar com a equipe: {team}.",
-                "time": now,
-            }
-        )
-
-        messages.append(
-            {
-                "agent": True,
-                "name": "Suporte",
-                "text": (
-                    f"Perfeito! Seu pedido foi direcionado para "
-                    f"{team}.\n\n"
-                    "Conte um pouco mais sobre o que aconteceu "
-                    "para que possamos ajudar."
-                ),
-                "time": now,
-            }
-        )
-
-        # render_messages()
-
-    # OPÇÕES RÁPIDAS
-
-    def team_button(title, icon):
-        return ft.Container(
-            expand=True,
-            content=ft.Button(
-                content=ft.Row(
-                    controls=[
-                        ft.Icon(icon, size=17, color=colors.PRIMARIO),
-                        txt(title, 11, WHITE),
-                    ],
-                    alignment=ft.MainAxisAlignment.CENTER,
-                    spacing=8,
-                ),
-                expand=True,
-                on_click=lambda e: choose_team(title),
-            ),
-        )
-
-    quick_options = ft.Container(
-        bgcolor=CARD_BG,
-        border=ft.Border.all(1, colors.CARD_BORDA),
-        border_radius=10,
-        padding=pad(16, 16, 16, 16),
-        content=ft.Column(
-            controls=[
-                txt("Como podemos ajudar?", 13, WHITE, True),
-                txt(
-                    "Selecione a equipe responsável pelo seu pedido.",
-                    11,
-                    MUTED,
-                ),
-                ft.Row(
-                    controls=[
-                        team_button(
-                            "Suporte técnico",
-                            ft.Icons.COMPUTER_OUTLINED,
-                        ),
-                        team_button(
-                            "SAC / Faturas",
-                            ft.Icons.RECEIPT_LONG_OUTLINED,
-                        ),
-                    ],
-                    spacing=10,
-                ),
-                ft.Row(
-                    controls=[
-                        team_button(
-                            "Conta e acesso",
-                            ft.Icons.PERSON_OUTLINED,
-                        ),
-                        team_button(
-                            "Dúvidas gerais",
-                            ft.Icons.HELP_OUTLINE,
-                        ),
-                    ],
-                    spacing=10,
-                ),
-            ],
-            spacing=10,
-        ),
-    )
-
-    # CAMPO DE MENSAGEM
 
     message_input = ft.TextField(
         hint_text="Digite sua mensagem.......",
@@ -922,35 +630,36 @@ def chatbot():
     # MONTAGEM FINAL DA TELA
 
     # render_messages()
-    print(messages)
-    return ft.Row(
+    return ft.SafeArea(
+        
+        ft.Row(
         controls=[
             # sidebar,
             ft.Column(
+                # bgcolor=colors.PRIMARIO,
                 controls=[
                     # header,
                     ft.Row(
                         controls=[
                             ft.Container(
                                 expand=True,
-                                bgcolor=colors.FUNDO,
+                                expand_loose=True,
+                                # bgcolor=colors.PRIMARIO,
+                                # alignment=ft.Alignment.,
+                                
                                 content=ft.Column(
+                                    expand_loose=True,
+                                    run_alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
+                                    # horizontal_alignment=ft.CrossAxisAlignment.STRETCH,
+                                    
                                     controls=[
                                         conversation_header,
                                         ft.Container(
                                             expand=True,
+                                            expand_loose=True,
+                                            # bgcolor=colors.PRIMARIO,
                                             padding=pad(20, 20, 20, 20),
-                                            content=ft.Column(
-                                                controls=[
-                                                    # ft.Container(
-                                                    #     alignment=ft.Alignment(0, 0),
-                                                    #     content=badge(
-                                                    #         "HOJE · 14 DE OUTUBRO",
-                                                    #         MUTED,
-                                                    #         CARD_BG,
-                                                    #     ),
-                                                    # ),
-                                                    ft.ListView(
+                                            content=ft.ListView(
                                                         controls=[
                                                             message_bubble(message)
                                                             for message in messages
@@ -960,10 +669,7 @@ def chatbot():
                                                         expand=True,
                                                     ),
                                                     # quick_options,
-                                                ],
-                                                spacing=20,
-                                                expand=True,
-                                            ),
+                                            
                                         ),
                                         composer,
                                     ],
@@ -975,14 +681,21 @@ def chatbot():
                         ],
                         spacing=0,
                         expand=True,
-                        vertical_alignment=ft.CrossAxisAlignment.STRETCH,
+                        expand_loose=True,
+                        vertical_alignment=ft.CrossAxisAlignment.CENTER,
                     ),
                 ],
                 spacing=0,
+                expand_loose=True,
                 expand=True,
             ),
         ],
         spacing=0,
         expand=True,
+        expand_loose=True,
         vertical_alignment=ft.CrossAxisAlignment.STRETCH,
+    ),
+    expand=True,
+    expand_loose=True,
+    
     )

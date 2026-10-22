@@ -173,6 +173,7 @@ def campo_busca(ao_mudar) -> ft.TextField:
 @ft.component
 def TabelaAdmin[T](obter: List[T], celulas: List[ColunaTabela[T]], alvo: str, form: str, endpoint: str):
     T = usar_cores()
+    update, set_update = ft.use_state(False)
     Cores = usar_cores()
     # Estado da tela: o texto digitado na busca
     busca, set_busca = ft.use_state("")
@@ -191,8 +192,10 @@ def TabelaAdmin[T](obter: List[T], celulas: List[ColunaTabela[T]], alvo: str, fo
         requisicao = instanciar_request(Constantes.HOST.value)
         # /carregadores/deletar/<int:id>
         requisicao.get_sem(f"/{endpoint}/deletar/{pid}")
-        
-        ft.context.page.update()
+        para_remover = next(i for i in obter if i.id == pid)
+        obter.remove(para_remover)
+        set_update(lambda x: not x)
+        # ft.context.page.update()
         # recargas = requisicao.get_lista("/recargas", Recarga)
 
     def novo(e):
